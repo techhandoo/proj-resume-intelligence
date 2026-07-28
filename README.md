@@ -1,5 +1,7 @@
 # PROJ — AI-Powered Resume Processing Platform
 
+🚀 **[Live Demo: https://proj-resume-intelligence.vercel.app/](https://proj-resume-intelligence.vercel.app/)**
+
 A modular monolith platform that uses AI (via Groq/OpenRouter) to process and analyze resumes, built with Spring Boot and React.
 
 ---
