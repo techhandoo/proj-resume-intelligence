@@ -33,7 +33,6 @@ data/
 
 ### Local Configs / Secrets ###
 application-local.yml
-application-prod.yml
 application-local.properties
 secrets.yml
 .env
