@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import AnimatedLayout from '../components/AnimatedLayout';
-import { Monitor, Server, Brain, Rocket, UploadCloud, FileSearch, Lightbulb, ShieldCheck, BarChart3, Architecture } from 'lucide-react';
+import { Monitor, Server, Brain, Rocket, UploadCloud, FileSearch, Lightbulb, ShieldCheck, BarChart3 } from 'lucide-react';
 
 const techStack = [
   {

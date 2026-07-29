@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AnimatedLayout from '../components/AnimatedLayout';
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { FileText, CheckCircle, Hourglass, AlertTriangle, FolderOpen, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 
@@ -53,7 +54,7 @@ export default function DashboardPage() {
     { label: 'Failed',            value: stats.failed,     gradient: 'from-rose-400 to-pink-500',     icon: <AlertTriangle className="w-6 h-6 text-rose-400" />, iconBg: 'bg-rose-500/10 border-rose-500/20',     accent: 'hover:border-rose-500/25'    },
   ];
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -61,7 +62,7 @@ export default function DashboardPage() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 15 },
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };

@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AnimatedLayout from '../components/AnimatedLayout';
-import { motion } from 'framer-motion';
-import { FileText, AlertCircle, Loader2, Target, Lightbulb, GraduationCap, TrendingUp, Sparkles } from 'lucide-react';
+import { FileText, AlertCircle, Loader2 } from 'lucide-react';
 import api from '../lib/api';
 
 interface ResumeDetail {
