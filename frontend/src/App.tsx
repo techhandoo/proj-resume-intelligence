@@ -6,6 +6,7 @@ import RegisterPage     from './pages/RegisterPage';
 import DashboardPage    from './pages/DashboardPage';
 import UploadPage       from './pages/UploadPage';
 import ResumeDetailPage from './pages/ResumeDetailPage';
+import CoverLetterPage  from './pages/CoverLetterPage';
 import AboutPage        from './pages/AboutPage';
 import ProtectedRoute   from './components/ProtectedRoute';
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/upload"       element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
         <Route path="/about"        element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
         <Route path="/resumes/:id"  element={<ProtectedRoute><ResumeDetailPage /></ProtectedRoute>} />
+        <Route path="/cover-letter" element={<ProtectedRoute><CoverLetterPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

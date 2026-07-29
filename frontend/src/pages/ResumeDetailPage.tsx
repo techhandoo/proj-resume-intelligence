@@ -18,6 +18,9 @@ interface AnalysisDetail {
   experienceYears: number | null;
   education: string;
   recommendations: string;
+  atsScore?: number;
+  insights?: string[];
+  improvements?: string[];
   analyzedAt: string;
 }
 
@@ -149,110 +152,123 @@ export default function ResumeDetailPage() {
             {analysis ? (
               <div className="space-y-8">
 
-                {/* Executive Summary */}
-                <div className="glass-card p-8 text-center">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <span className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-blue-400 text-base">
-                      📝
-                    </span>
-                    <h2 className="text-lg font-bold text-white tracking-tight">
-                      Executive Summary
-                    </h2>
+                {/* Top Row: ATS Score & Executive Summary */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  
+                  {/* ATS Score Gauge */}
+                  <div className="glass-card p-8 flex flex-col items-center justify-center text-center lg:col-span-1">
+                    <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">ATS Compatibility</h2>
+                    <div className="relative w-32 h-32 flex items-center justify-center rounded-full bg-slate-900/50 border-[6px] border-slate-800 shadow-inner mb-4">
+                      {/* Fake SVG Circle for Score */}
+                      <svg className="absolute inset-0 w-full h-full transform -rotate-90">
+                        <circle cx="64" cy="64" r="58" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6" />
+                        <circle 
+                          cx="64" cy="64" r="58" fill="none" 
+                          stroke={analysis.atsScore && analysis.atsScore > 75 ? '#34d399' : analysis.atsScore && analysis.atsScore > 50 ? '#fbbf24' : '#f87171'} 
+                          strokeWidth="6" 
+                          strokeDasharray="364" 
+                          strokeDashoffset={364 - (364 * (analysis.atsScore || 0)) / 100}
+                          className="transition-all duration-1000 ease-out"
+                        />
+                      </svg>
+                      <span className="text-4xl font-black text-white z-10">{analysis.atsScore || '--'}</span>
+                    </div>
+                    <p className="text-xs text-slate-400">Score based on keyword density and formatting</p>
                   </div>
-                  <p className="text-slate-300 leading-relaxed text-sm sm:text-[15px] font-normal text-center max-w-2xl mx-auto">
-                    {analysis.summary && !analysis.summary.includes('Failed to load')
-                      ? analysis.summary
-                      : 'Candidate profile analyzed. Skills and technical experience extracted successfully.'}
-                  </p>
+
+                  {/* Executive Summary */}
+                  <div className="glass-card p-8 flex flex-col justify-center lg:col-span-2">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="w-8 h-8 rounded-lg bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-blue-400">📝</span>
+                      <h2 className="text-lg font-bold text-white tracking-tight">Executive Summary</h2>
+                    </div>
+                    <p className="text-slate-300 leading-relaxed text-[15px] font-normal">
+                      {analysis.summary}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Skills & Candidate Profile Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
+                {/* Skills & Stats */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Extracted Skills */}
-                  <div className="glass-card p-7 text-center flex flex-col items-center">
-                    <div className="flex items-center justify-center gap-3 mb-5">
-                      <span className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400 text-base">
-                        💡
-                      </span>
-                      <h2 className="text-lg font-bold text-white tracking-tight">
-                        Extracted Skills
-                      </h2>
+                  <div className="glass-card p-7 lg:col-span-2">
+                    <div className="flex items-center gap-3 mb-5">
+                      <span className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400">💡</span>
+                      <h2 className="text-lg font-bold text-white tracking-tight">Technical & Soft Skills</h2>
                     </div>
-                    <div className="flex flex-wrap gap-2.5 justify-center">
-                      {analysis.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="px-3.5 py-1.5 text-xs font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-xl hover:border-blue-400/40 hover:bg-blue-500/15 transition-colors"
-                        >
-                          {skill}
+                    <div className="flex flex-wrap gap-2.5">
+                      {analysis.skills.map((skill, idx) => (
+                        <span key={idx} className="px-3.5 py-1.5 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                          {skill.trim()}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Candidate Profile */}
-                  <div className="glass-card p-7 text-center flex flex-col items-center">
-                    <div className="flex items-center justify-center gap-3 mb-5">
-                      <span className="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400 text-base">
-                        🎓
-                      </span>
-                      <h2 className="text-lg font-bold text-white tracking-tight">
-                        Candidate Profile
-                      </h2>
+                  {/* Candidate Profile Stats */}
+                  <div className="glass-card p-7 flex flex-col gap-4 justify-center">
+                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.05]">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Experience</p>
+                      <p className="text-2xl font-black text-white">{analysis.experienceYears != null ? `${analysis.experienceYears} Years` : 'N/A'}</p>
                     </div>
-                    <div className="space-y-4 w-full">
-                      <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.05] text-center">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Total Experience</p>
-                        <p className="text-3xl font-black bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                          {analysis.experienceYears != null ? `${analysis.experienceYears} Yrs` : 'N/A'}
-                        </p>
-                      </div>
-                      <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.05] text-center">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Education</p>
-                        <p className="text-slate-200 font-medium text-sm">{analysis.education || 'Not specified'}</p>
-                      </div>
+                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.05]">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Education</p>
+                      <p className="text-sm font-semibold text-slate-200 leading-snug">{analysis.education || 'Not specified'}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* AI Recommendations */}
-                <div className="glass-card p-8 text-center flex flex-col items-center">
-                  <div className="flex items-center justify-center gap-3 mb-6">
-                    <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-amber-400 text-base">
-                      🚀
-                    </span>
-                    <h2 className="text-lg font-bold text-white tracking-tight">
-                      Actionable AI Recommendations
-                    </h2>
-                  </div>
-                  <div className="space-y-3.5 w-full max-w-2xl">
-                    {analysis.recommendations
-                      ?.split(';')
-                      .filter(Boolean)
-                      .map((rec, i) => (
-                        <div
-                          key={i}
-                          className="flex items-start gap-4 p-4 rounded-2xl bg-slate-900/50 border border-white/[0.04] text-left hover:border-blue-500/20 transition-colors"
-                        >
-                          <span className="flex-shrink-0 w-7 h-7 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-xs font-bold border border-blue-500/25">
-                            {i + 1}
-                          </span>
-                          <p className="text-slate-300 text-sm leading-relaxed">{rec.trim()}</p>
-                        </div>
+                {/* AI Insights & Improvements */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Key Insights */}
+                  <div className="glass-card p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400">🔍</span>
+                      <h2 className="text-lg font-bold text-white tracking-tight">Key Insights</h2>
+                    </div>
+                    <ul className="space-y-4">
+                      {(analysis.insights || []).map((insight, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-slate-300">
+                          <span className="text-indigo-400 mt-0.5">•</span> {insight}
+                        </li>
                       ))}
+                    </ul>
                   </div>
+
+                  {/* Actionable Improvements */}
+                  <div className="glass-card p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-rose-400">📈</span>
+                      <h2 className="text-lg font-bold text-white tracking-tight">Actionable Improvements</h2>
+                    </div>
+                    <ul className="space-y-4">
+                      {(analysis.improvements || []).map((imp, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-slate-300">
+                          <span className="text-rose-400 mt-0.5">→</span> {imp}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* AI Recommendations String (Legacy Fallback / Summary) */}
+                <div className="glass-card p-6 border-l-4 border-l-blue-500 bg-blue-500/5">
+                  <p className="text-sm text-slate-300 leading-relaxed italic">
+                    "{analysis.recommendations}"
+                  </p>
+                </div>
+
+                {/* Action Row */}
+                <div className="flex justify-center pt-4">
+                  <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary">
+                    ✨ Generate Cover Letter
+                  </Link>
                 </div>
 
                 {/* Footer Metadata */}
-                <div className="text-center py-4">
-                  <p className="text-xs text-slate-500 text-center">
-                    Processed via Groq AI Engine •{' '}
-                    {new Date(analysis.analyzedAt).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
+                <div className="text-center pb-4">
+                  <p className="text-[11px] text-slate-500">
+                    Processed via Groq LLaMA 3 Engine • {new Date(analysis.analyzedAt).toLocaleDateString()}
                   </p>
                 </div>
 

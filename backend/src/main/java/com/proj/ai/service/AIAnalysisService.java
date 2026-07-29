@@ -38,14 +38,19 @@ public class AIAnalysisService {
     private String model;
 
     private static final String ANALYSIS_PROMPT = """
-            You are a professional resume analyst. Analyze the following resume text and provide a structured analysis.
-
-            Respond ONLY with the following format (no markdown, no extra text):
-            SUMMARY: <A 2-3 sentence professional summary of the candidate>
-            SKILLS: <Comma-separated list of technical and soft skills found>
-            EXPERIENCE_YEARS: <Estimated total years of professional experience as a number>
-            EDUCATION: <Highest education level and field, e.g. "Bachelor's in Computer Science">
-            RECOMMENDATIONS: <3-4 actionable recommendations to improve this resume, separated by semicolons>
+            You are a professional resume analyst and ATS (Applicant Tracking System) simulator. Analyze the following resume text.
+            
+            You MUST respond ONLY with a valid JSON object. Do not include markdown formatting or extra text. Use this exact schema:
+            {
+              "summary": "A 2-3 sentence professional summary of the candidate",
+              "skills": "Comma-separated list of technical and soft skills found",
+              "experienceYears": <Estimated total years of professional experience as an integer>,
+              "education": "Highest education level and field, e.g. 'Bachelor's in Computer Science'",
+              "atsScore": <An integer from 0 to 100 estimating how well this resume would pass an ATS filter based on formatting and keyword density>,
+              "insights": ["Insight 1", "Insight 2", "Insight 3"],
+              "improvements": ["Actionable improvement 1", "Actionable improvement 2", "Actionable improvement 3"],
+              "recommendations": "A single string summarizing the improvements"
+            }
 
             Resume text:
             ---
@@ -84,11 +89,11 @@ public class AIAnalysisService {
         log.info("Calling Groq API at {} with model: {}", url, model);
 
         try {
-            Map<String, Object> requestMap = Map.of(
-                    "model", model,
-                    "messages", List.of(Map.of("role", "user", "content", promptText)),
-                    "temperature", 0.3
-            );
+            Map<String, Object> requestMap = new java.util.HashMap<>();
+            requestMap.put("model", model);
+            requestMap.put("messages", List.of(Map.of("role", "user", "content", promptText)));
+            requestMap.put("temperature", 0.3);
+            requestMap.put("response_format", Map.of("type", "json_object"));
             String jsonPayload = objectMapper.writeValueAsString(requestMap);
 
             TrustManager[] trustAllCerts = new TrustManager[]{
@@ -138,11 +143,43 @@ public class AIAnalysisService {
     private Analysis parseAnalysisResponse(String content, Resume resume) {
         String rawText = resume.getRawText() != null ? resume.getRawText() : "";
 
-        String summary = extractField(content, "SUMMARY");
-        String skills = extractField(content, "SKILLS");
-        String experienceStr = extractField(content, "EXPERIENCE_YEARS");
-        String education = extractField(content, "EDUCATION");
-        String recommendations = extractField(content, "RECOMMENDATIONS");
+        String summary = null;
+        String skills = null;
+        String education = null;
+        String recommendations = null;
+        Integer experienceYears = null;
+        Integer atsScore = null;
+        List<String> insights = new ArrayList<>();
+        List<String> improvements = new ArrayList<>();
+
+        if (content != null && !content.isBlank()) {
+            try {
+                JsonNode root = objectMapper.readTree(content);
+                summary = root.path("summary").asText(null);
+                skills = root.path("skills").asText(null);
+                education = root.path("education").asText(null);
+                recommendations = root.path("recommendations").asText(null);
+                if (root.has("experienceYears") && !root.get("experienceYears").isNull()) {
+                    experienceYears = root.get("experienceYears").asInt();
+                }
+                if (root.has("atsScore") && !root.get("atsScore").isNull()) {
+                    atsScore = root.get("atsScore").asInt();
+                }
+                
+                if (root.has("insights") && root.get("insights").isArray()) {
+                    for (JsonNode node : root.get("insights")) {
+                        insights.add(node.asText());
+                    }
+                }
+                if (root.has("improvements") && root.get("improvements").isArray()) {
+                    for (JsonNode node : root.get("improvements")) {
+                        improvements.add(node.asText());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse AI JSON response: {}", e.getMessage());
+            }
+        }
 
         // Resilient Fallbacks
         if (summary == null || summary.isBlank()) {
@@ -161,16 +198,20 @@ public class AIAnalysisService {
             recommendations = "Highlight quantifiable achievements and metrics for past roles; Add a dedicated technical skills matrix at the top of the resume; Include relevant certifications and portfolio links; Tailor key summary phrases to target job descriptions.";
         }
 
-        Integer experienceYears = null;
-        try {
-            if (experienceStr != null && !experienceStr.isBlank()) {
-                experienceYears = Integer.parseInt(experienceStr.replaceAll("[^0-9]", ""));
-            }
-        } catch (NumberFormatException e) {
-            log.warn("Could not parse experience years: {}", experienceStr);
-        }
         if (experienceYears == null || experienceYears <= 0) {
             experienceYears = estimateExperienceFromText(rawText);
+        }
+
+        if (atsScore == null) {
+            atsScore = 65; // Default fallback score
+        }
+
+        if (insights.isEmpty()) {
+            insights = List.of("Standard resume format detected.", "Identified key technical skills.", "Experience section matches industry standards.");
+        }
+
+        if (improvements.isEmpty()) {
+            improvements = List.of("Use more action verbs.", "Quantify achievements with metrics.", "Tailor summary to target job role.");
         }
 
         return Analysis.builder()
@@ -180,23 +221,10 @@ public class AIAnalysisService {
                 .experienceYears(experienceYears)
                 .education(education)
                 .recommendations(recommendations)
+                .atsScore(atsScore)
+                .insights(insights)
+                .improvements(improvements)
                 .build();
-    }
-
-    private String extractField(String content, String fieldName) {
-        if (content == null || content.isBlank()) return null;
-
-        // Regex matches "SUMMARY:", "**SUMMARY:**", "* SUMMARY:", "SUMMARY -", etc.
-        Pattern pattern = Pattern.compile(
-                "(?i)(?:\\*\\*|\\*|#)*\\s*" + Pattern.quote(fieldName) + "\\s*(?:\\*\\*|\\*)*\\s*[:\\-=\\>]\\s*(.*)",
-                Pattern.MULTILINE
-        );
-        Matcher matcher = pattern.matcher(content);
-        if (matcher.find()) {
-            String result = matcher.group(1).trim();
-            return result.replaceAll("^\\*\\*|\\*\\*$", "").trim();
-        }
-        return null;
     }
 
     private String generateFallbackSummary(String text) {
@@ -248,5 +276,71 @@ public class AIAnalysisService {
             } catch (NumberFormatException ignored) {}
         }
         return 3; // Default realistic estimation
+    }
+
+    public String generateCoverLetter(String resumeText, String jobDescription) {
+        String prompt = """
+            You are an expert career coach and professional copywriter.
+            Write a highly tailored, professional, and compelling cover letter for the candidate based on their resume and the target job description.
+            The cover letter should be directly addressed to the Hiring Manager, highlight the candidate's most relevant skills, and be formatted in clean Markdown.
+            Do NOT include any extra conversational text outside of the cover letter itself.
+            
+            Target Job Description:
+            ---
+            %s
+            ---
+            
+            Candidate's Resume:
+            ---
+            %s
+            ---
+            """.formatted(jobDescription, resumeText);
+            
+        try {
+            return callGroqApiTextOnly(prompt);
+        } catch (Exception e) {
+            log.error("Failed to generate cover letter: {}", e.getMessage());
+            throw new RuntimeException("Cover letter generation failed", e);
+        }
+    }
+    
+    private String callGroqApiTextOnly(String promptText) throws Exception {
+        String url = "https://api.groq.com/openai/v1/chat/completions";
+        String cleanKey = apiKey != null ? apiKey.trim() : "";
+        if (cleanKey.isBlank()) throw new IllegalStateException("Groq API key is not configured.");
+
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("model", model);
+        requestMap.put("messages", List.of(Map.of("role", "user", "content", promptText)));
+        requestMap.put("temperature", 0.7);
+
+        String jsonPayload = objectMapper.writeValueAsString(requestMap);
+
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+            }
+        };
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, trustAllCerts, new SecureRandom());
+        HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bearer " + cleanKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() >= 400) {
+            throw new RuntimeException("Groq API returned HTTP " + response.statusCode());
+        }
+
+        JsonNode root = objectMapper.readTree(response.body());
+        return root.path("choices").get(0).path("message").path("content").asText();
     }
 }

@@ -59,12 +59,12 @@ export default function DashboardPage() {
         <main className="max-w-[1440px] mx-auto px-8 sm:px-14 py-12">
 
           {/* ── Page Header ── */}
-          <div className="flex flex-col items-center justify-center text-center gap-6 mb-12">
+          <div className="page-header">
             <div>
-              <h1 className="text-4xl sm:text-[2.5rem] font-extrabold text-white tracking-tight leading-tight">
+              <h1 className="page-title">
                 Resume Intelligence
               </h1>
-              <p className="text-slate-400 text-[15.5px] leading-[1.85] mt-3 max-w-xl mx-auto">
+              <p className="page-subtitle max-w-xl">
                 AI-driven candidate analysis, skill extraction, and resume recommendations.
               </p>
             </div>
