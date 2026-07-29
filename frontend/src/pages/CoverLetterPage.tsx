@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import AnimatedLayout from '../components/AnimatedLayout';
+import { Target, Mail, PenTool, Loader2 } from 'lucide-react';
 import api from '../lib/api';
 
 export default function CoverLetterPage() {
@@ -54,7 +56,7 @@ export default function CoverLetterPage() {
   };
 
   return (
-    <div className="vibrant-bg min-h-screen relative">
+    <AnimatedLayout className="vibrant-bg min-h-screen relative">
       <div className="vibrant-overlay" />
       <div className="relative z-10">
         <Navbar />
@@ -85,7 +87,9 @@ export default function CoverLetterPage() {
             {/* Left Panel: Input */}
             <div className="glass-card p-8 flex flex-col h-[650px]">
               <div className="flex items-center gap-3 mb-6">
-                <span className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400">🎯</span>
+                <span className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+                  <Target className="w-5 h-5" />
+                </span>
                 <h2 className="text-lg font-bold text-white tracking-tight">Target Job Description</h2>
               </div>
               
@@ -124,11 +128,13 @@ export default function CoverLetterPage() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 rounded-full border-[2px] border-white/20 border-t-white animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Writing Cover Letter...
                   </span>
                 ) : (
-                  '✨ Generate Cover Letter'
+                  <span className="flex items-center justify-center gap-2">
+                    <PenTool className="w-4 h-4" /> Generate Cover Letter
+                  </span>
                 )}
               </button>
             </div>
@@ -136,7 +142,9 @@ export default function CoverLetterPage() {
             {/* Right Panel: Output */}
             <div className="glass-card p-8 flex flex-col h-[650px] relative overflow-hidden">
               <div className="flex items-center gap-3 mb-6 relative z-10">
-                <span className="w-8 h-8 rounded-lg bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-blue-400">✉️</span>
+                <span className="w-8 h-8 rounded-lg bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-blue-400">
+                  <Mail className="w-5 h-5" />
+                </span>
                 <h2 className="text-lg font-bold text-white tracking-tight">Generated Cover Letter</h2>
               </div>
               
@@ -147,7 +155,7 @@ export default function CoverLetterPage() {
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-center opacity-50">
-                    <span className="text-4xl mb-4">✍️</span>
+                    <PenTool className="w-10 h-10 mb-4 text-slate-400" />
                     <p className="text-slate-400 font-medium">Your generated cover letter will appear here.</p>
                   </div>
                 )}
@@ -157,6 +165,6 @@ export default function CoverLetterPage() {
           </div>
         </main>
       </div>
-    </div>
+    </AnimatedLayout>
   );
 }

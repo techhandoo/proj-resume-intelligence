@@ -1,11 +1,12 @@
 import Navbar from '../components/Navbar';
-
+import AnimatedLayout from '../components/AnimatedLayout';
+import { Monitor, Server, Brain, Rocket, UploadCloud, FileSearch, Lightbulb, ShieldCheck, BarChart3, Architecture } from 'lucide-react';
 
 const techStack = [
   {
     category: 'Frontend',
     color: 'blue',
-    icon: '🖥️',
+    icon: <Monitor className="w-5 h-5" />,
     items: [
       { name: 'React 18', desc: 'Component-based UI library with hooks and concurrent rendering' },
       { name: 'TypeScript', desc: 'Typed JavaScript for safer, more scalable code' },
@@ -19,7 +20,7 @@ const techStack = [
   {
     category: 'Backend',
     color: 'indigo',
-    icon: '⚙️',
+    icon: <Server className="w-5 h-5" />,
     items: [
       { name: 'Spring Boot 3.4', desc: 'Production-grade Java framework with auto-configuration' },
       { name: 'Spring Security', desc: 'JWT-based stateless authentication and authorization' },
@@ -33,7 +34,7 @@ const techStack = [
   {
     category: 'AI & Data',
     color: 'teal',
-    icon: '🤖',
+    icon: <Brain className="w-5 h-5" />,
     items: [
       { name: 'Groq Cloud API', desc: 'Ultra-fast LLM inference — 500+ tokens/second throughput' },
       { name: 'LLaMA 3.3 70B', desc: 'Meta\'s flagship open-weight model for deep text understanding' },
@@ -45,7 +46,7 @@ const techStack = [
   {
     category: 'Infrastructure',
     color: 'amber',
-    icon: '🚀',
+    icon: <Rocket className="w-5 h-5" />,
     items: [
       { name: 'Docker Compose', desc: 'Multi-service orchestration for Postgres and RabbitMQ' },
       { name: 'Maven Wrapper', desc: 'Reproducible builds with pinned Maven version' },
@@ -57,32 +58,32 @@ const techStack = [
 
 const features = [
   {
-    icon: '📤',
+    icon: <UploadCloud className="w-7 h-7" />,
     title: 'Resume Upload',
     desc: 'Upload plain-text (.txt) or PDF resumes via drag-and-drop or file browse. PDFs are parsed client-side using PDF.js before submission.',
   },
   {
-    icon: '🧠',
+    icon: <Brain className="w-7 h-7" />,
     title: 'AI Analysis Pipeline',
     desc: 'Uploaded resumes are queued via RabbitMQ and processed asynchronously by a Spring worker that sends structured prompts to the Groq LLM.',
   },
   {
-    icon: '🔍',
+    icon: <FileSearch className="w-7 h-7" />,
     title: 'Skill Extraction',
     desc: 'The LLM extracts technical and soft skills, estimates years of experience, identifies education background, and generates a professional summary.',
   },
   {
-    icon: '💡',
+    icon: <Lightbulb className="w-7 h-7" />,
     title: 'AI Recommendations',
     desc: 'Each analyzed resume receives a list of actionable improvement suggestions tailored to modern job market expectations.',
   },
   {
-    icon: '🔐',
+    icon: <ShieldCheck className="w-7 h-7" />,
     title: 'Secure Auth',
     desc: 'JWT-based stateless authentication with BCrypt-hashed passwords. Tokens expire after 24 hours and are automatically cleared on expiry.',
   },
   {
-    icon: '📊',
+    icon: <BarChart3 className="w-7 h-7" />,
     title: 'Dashboard Analytics',
     desc: 'Real-time stats on total, analyzed, in-queue, and failed resumes with a sortable history table and quick access to individual reports.',
   },
@@ -97,7 +98,7 @@ const colorMap: Record<string, { border: string; bg: string; badge: string; dot:
 
 export default function AboutPage() {
   return (
-    <div className="vibrant-bg min-h-screen relative overflow-x-hidden flex flex-col justify-between">
+    <AnimatedLayout className="vibrant-bg min-h-screen relative overflow-x-hidden flex flex-col justify-between">
       <div className="vibrant-overlay" />
       <div className="hero-glow" />
       <div className="hero-glow-secondary" />
@@ -145,8 +146,8 @@ export default function AboutPage() {
           {/* ── 3. Architecture Card — Pure Symmetrical Centered Box In-Between ── */}
           <div className="my-20 flex justify-center">
             <div className="glass-card p-10 sm:p-12 text-center max-w-3xl w-full mx-auto flex flex-col items-center justify-center shadow-2xl">
-              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-3xl mb-6 shadow-md">
-                🏗️
+              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-6 shadow-md">
+                <Server className="w-8 h-8" />
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-5 tracking-tight text-center">
@@ -224,6 +225,6 @@ export default function AboutPage() {
 
         </main>
       </div>
-    </div>
+    </AnimatedLayout>
   );
 }

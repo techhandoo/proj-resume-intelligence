@@ -1,21 +1,23 @@
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
+import AnimatedLayout from '../components/AnimatedLayout';
+import { FileText, Brain, Zap } from 'lucide-react';
 
 const features = [
   {
-    icon: '📄',
+    icon: <FileText className="w-8 h-8 text-blue-400" />,
     title: 'Smart Resume Ingestion',
     description: 'Instant text parsing with drop-and-upload capabilities built for modern recruiter workflows.',
     iconBg: 'bg-blue-500/10 border-blue-500/20',
   },
   {
-    icon: '🤖',
+    icon: <Brain className="w-8 h-8 text-indigo-400" />,
     title: 'Deep AI Analytics',
     description: 'Powered by advanced Groq LLM engines to extract structured candidate skills, metrics, and education.',
     iconBg: 'bg-indigo-500/10 border-indigo-500/20',
   },
   {
-    icon: '⚡',
+    icon: <Zap className="w-8 h-8 text-teal-400" />,
     title: 'Instant Recommendations',
     description: 'Receive automated candidate improvement suggestions and structured career insights in seconds.',
     iconBg: 'bg-teal-500/10 border-teal-500/20',
@@ -24,7 +26,7 @@ const features = [
 
 export default function LandingPage() {
   return (
-    <div className="vibrant-bg min-h-screen relative overflow-x-hidden flex flex-col justify-between">
+    <AnimatedLayout className="vibrant-bg min-h-screen relative overflow-x-hidden flex flex-col justify-between">
       <div className="vibrant-overlay" />
       <div className="hero-glow" />
       <div className="hero-glow-secondary" />
@@ -128,6 +130,6 @@ export default function LandingPage() {
           </span>
         </div>
       </footer>
-    </div>
+    </AnimatedLayout>
   );
 }

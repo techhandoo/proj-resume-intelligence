@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as pdfjsLib from 'pdfjs-dist';
 import Navbar from '../components/Navbar';
+import AnimatedLayout from '../components/AnimatedLayout';
+import { UploadCloud, FileText, File, AlertCircle, Loader2, CheckCircle, Zap } from 'lucide-react';
 import api from '../lib/api';
 
 // Configure PDF.js worker (use CDN for simplicity in Vite)
@@ -92,7 +94,7 @@ export default function UploadPage() {
   const isReady = content.trim() && fileName.trim() && !parsing;
 
   return (
-    <div className="vibrant-bg min-h-screen relative">
+    <AnimatedLayout className="vibrant-bg min-h-screen relative">
       <div className="vibrant-overlay" />
       <div className="relative z-10">
         <Navbar />
@@ -102,8 +104,8 @@ export default function UploadPage() {
 
             {/* Page Header */}
             <div className="text-center mb-12">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-3xl mx-auto mb-6">
-                📤
+              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-6">
+                <UploadCloud className="w-8 h-8" />
               </div>
               <h1 className="text-4xl font-extrabold text-white tracking-tight mb-4">
                 Upload Resume
@@ -120,7 +122,9 @@ export default function UploadPage() {
             {/* Error */}
             {error && (
               <div className="mb-7 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 text-xs font-bold flex-shrink-0 mt-0.5">!</div>
+                <div className="flex-shrink-0 mt-0.5 text-rose-400">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
                 <p className="text-rose-400 text-sm font-medium leading-relaxed">{error}</p>
               </div>
             )}
@@ -162,14 +166,14 @@ export default function UploadPage() {
                 >
                   {parsing ? (
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-10 h-10 rounded-full border-[3px] border-blue-500/20 border-t-blue-500 animate-spin" />
+                      <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
                       <p className="text-sm font-semibold text-blue-400">Extracting text from PDF...</p>
                       <p className="text-xs text-slate-500">This may take a moment for large files</p>
                     </div>
                   ) : (
                     <>
-                      <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
-                        📁
+                      <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
+                        <UploadCloud className="w-7 h-7" />
                       </div>
                       <p className="text-base font-semibold text-slate-200 mb-2">
                         Drag &amp; drop your resume here
@@ -199,7 +203,11 @@ export default function UploadPage() {
                       ? 'bg-red-500/10 border-red-500/20 text-red-400'
                       : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
                   }`}>
-                    {fileType === 'pdf' ? '📕 PDF parsed' : '📄 TXT loaded'} — {content.length.toLocaleString()} characters extracted
+                    {fileType === 'pdf' ? (
+                      <><File className="w-4 h-4" /> PDF parsed</>
+                    ) : (
+                      <><FileText className="w-4 h-4" /> TXT loaded</>
+                    )} — {content.length.toLocaleString()} characters extracted
                   </div>
                 )}
 
@@ -231,7 +239,7 @@ export default function UploadPage() {
                   </span>
                   {content.length > 0 && (
                     <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <CheckCircle className="w-4 h-4" />
                       Ready for submission
                     </span>
                   )}
@@ -246,11 +254,13 @@ export default function UploadPage() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-3">
-                    <span className="w-5 h-5 rounded-full border-2 border-white/25 border-t-white animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Analyzing Resume...
                   </span>
                 ) : (
-                  '⚡  Submit for AI Analysis'
+                  <span className="flex items-center justify-center gap-2">
+                    <Zap className="w-5 h-5" /> Submit for AI Analysis
+                  </span>
                 )}
               </button>
 
@@ -263,6 +273,6 @@ export default function UploadPage() {
           </div>
         </main>
       </div>
-    </div>
+    </AnimatedLayout>
   );
 }

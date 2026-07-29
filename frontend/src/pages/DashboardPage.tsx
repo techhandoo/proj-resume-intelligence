@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import AnimatedLayout from '../components/AnimatedLayout';
+import { motion } from 'framer-motion';
+import { FileText, CheckCircle, Hourglass, AlertTriangle, FolderOpen, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 
 interface ResumeItem {
@@ -44,14 +47,27 @@ export default function DashboardPage() {
   };
 
   const statCards = [
-    { label: 'Total Resumes',     value: stats.total,      gradient: 'from-blue-400 to-blue-500',     icon: '📄', iconBg: 'bg-blue-500/10 border-blue-500/20',    accent: 'hover:border-blue-500/25'    },
-    { label: 'Analyzed',          value: stats.analyzed,   gradient: 'from-emerald-400 to-teal-400',  icon: '✅', iconBg: 'bg-emerald-500/10 border-emerald-500/20', accent: 'hover:border-emerald-500/25' },
-    { label: 'In Queue',          value: stats.processing, gradient: 'from-amber-400 to-orange-400',  icon: '⏳', iconBg: 'bg-amber-500/10 border-amber-500/20',   accent: 'hover:border-amber-500/25'   },
-    { label: 'Failed',            value: stats.failed,     gradient: 'from-rose-400 to-pink-500',     icon: '⚠️', iconBg: 'bg-rose-500/10 border-rose-500/20',     accent: 'hover:border-rose-500/25'    },
+    { label: 'Total Resumes',     value: stats.total,      gradient: 'from-blue-400 to-blue-500',     icon: <FileText className="w-6 h-6 text-blue-400" />, iconBg: 'bg-blue-500/10 border-blue-500/20',    accent: 'hover:border-blue-500/25'    },
+    { label: 'Analyzed',          value: stats.analyzed,   gradient: 'from-emerald-400 to-teal-400',  icon: <CheckCircle className="w-6 h-6 text-emerald-400" />, iconBg: 'bg-emerald-500/10 border-emerald-500/20', accent: 'hover:border-emerald-500/25' },
+    { label: 'In Queue',          value: stats.processing, gradient: 'from-amber-400 to-orange-400',  icon: <Hourglass className="w-6 h-6 text-amber-400" />, iconBg: 'bg-amber-500/10 border-amber-500/20',   accent: 'hover:border-amber-500/25'   },
+    { label: 'Failed',            value: stats.failed,     gradient: 'from-rose-400 to-pink-500',     icon: <AlertTriangle className="w-6 h-6 text-rose-400" />, iconBg: 'bg-rose-500/10 border-rose-500/20',     accent: 'hover:border-rose-500/25'    },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="vibrant-bg min-h-screen relative">
+    <AnimatedLayout className="vibrant-bg min-h-screen relative">
       <div className="vibrant-overlay" />
       <div className="relative z-10">
         <Navbar />
@@ -76,9 +92,14 @@ export default function DashboardPage() {
           <div className="section-divider mb-10" />
 
           {/* ── Stat Cards ── */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10"
+          >
             {statCards.map((stat) => (
-              <div key={stat.label} className={`stat-card ${stat.accent}`}>
+              <motion.div variants={itemVariants} key={stat.label} className={`stat-card ${stat.accent}`}>
                 <div className="space-y-1.5">
                   <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
                     {stat.label}
@@ -87,12 +108,12 @@ export default function DashboardPage() {
                     {stat.value}
                   </p>
                 </div>
-                <div className={`w-12 h-12 rounded-xl ${stat.iconBg} border flex items-center justify-center text-xl flex-shrink-0`}>
+                <div className={`w-12 h-12 rounded-xl ${stat.iconBg} border flex items-center justify-center flex-shrink-0`}>
                   {stat.icon}
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="section-divider mb-8" />
 
@@ -121,7 +142,9 @@ export default function DashboardPage() {
 
             ) : error ? (
               <div className="py-16 text-center px-8">
-                <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-5 text-2xl">⚠</div>
+                <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-5 text-rose-400">
+                  <AlertCircle className="w-7 h-7" />
+                </div>
                 <p className="text-rose-400 font-semibold text-[15px] mb-2">Connection Error</p>
                 <p className="text-slate-500 text-sm leading-relaxed mb-6 max-w-sm mx-auto">{error}</p>
                 <button onClick={fetchResumes} className="btn-secondary btn-sm">
@@ -131,8 +154,8 @@ export default function DashboardPage() {
 
             ) : resumes.length === 0 ? (
               <div className="py-24 text-center px-8">
-                <div className="w-20 h-20 rounded-3xl bg-blue-500/8 border border-blue-500/15 flex items-center justify-center text-4xl mx-auto mb-7">
-                  📂
+                <div className="w-20 h-20 rounded-3xl bg-blue-500/8 border border-blue-500/15 flex items-center justify-center text-blue-400 mx-auto mb-7">
+                  <FolderOpen className="w-10 h-10" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">
                   No resumes yet
@@ -207,9 +230,8 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-
         </main>
       </div>
-    </div>
+    </AnimatedLayout>
   );
 }

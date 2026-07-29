@@ -1,4 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { LayoutDashboard, UploadCloud, Info, PenTool, LogOut } from 'lucide-react';
 import { getUser, clearAuth } from '../lib/auth';
 import Logo from './Logo';
 
@@ -15,10 +16,10 @@ export default function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { to: '/dashboard', label: 'Dashboard' },
-    { to: '/upload',    label: 'Upload'    },
-    { to: '/about',     label: 'About'     },
-    { to: '/cover-letter', label: 'Cover Letter' },
+    { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { to: '/upload',    label: 'Upload',    icon: <UploadCloud className="w-4 h-4" /> },
+    { to: '/about',     label: 'About',     icon: <Info className="w-4 h-4" /> },
+    { to: '/cover-letter', label: 'Cover Letter', icon: <PenTool className="w-4 h-4" /> },
   ];
 
   return (
@@ -30,16 +31,17 @@ export default function Navbar() {
 
         {/* Nav Links */}
         <div className="flex items-center gap-1">
-          {navLinks.map(({ to, label }) => (
+          {navLinks.map(({ to, label, icon }) => (
             <Link
               key={to}
               to={to}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 ${
                 isActive(to)
-                  ? 'text-white bg-blue-500/15 border border-blue-500/25'
+                  ? 'text-white bg-blue-500/15 border border-blue-500/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
               }`}
             >
+              {icon}
               {label}
             </Link>
           ))}
@@ -58,8 +60,8 @@ export default function Navbar() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shadow-md ring-2 ring-white/10 flex-shrink-0">
             {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
           </div>
-          <button onClick={handleLogout} className="btn-danger btn-sm hidden sm:inline-flex">
-            Logout
+          <button onClick={handleLogout} className="btn-danger btn-sm hidden sm:inline-flex items-center gap-2">
+            <LogOut className="w-4 h-4" /> Logout
           </button>
         </div>
       </div>

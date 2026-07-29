@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import AnimatedLayout from '../components/AnimatedLayout';
+import { motion } from 'framer-motion';
+import { FileText, AlertCircle, Loader2, Target, Lightbulb, GraduationCap, TrendingUp, Sparkles } from 'lucide-react';
 import api from '../lib/api';
 
 interface ResumeDetail {
@@ -60,29 +63,29 @@ export default function ResumeDetailPage() {
 
   if (loading) {
     return (
-      <div className="vibrant-bg min-h-screen relative">
+      <AnimatedLayout className="vibrant-bg min-h-screen relative">
         <div className="vibrant-overlay" />
         <div className="relative z-10">
           <Navbar />
           <div className="flex flex-col items-center justify-center py-40 gap-5">
-            <div className="w-12 h-12 rounded-full border-[3px] border-blue-500/20 border-t-blue-500 animate-spin" />
+            <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
             <p className="text-slate-400 font-medium text-sm">Loading resume details...</p>
           </div>
         </div>
-      </div>
+      </AnimatedLayout>
     );
   }
 
   if (error || !resume) {
     return (
-      <div className="vibrant-bg min-h-screen relative">
+      <AnimatedLayout className="vibrant-bg min-h-screen relative">
         <div className="vibrant-overlay" />
         <div className="relative z-10">
           <Navbar />
           <div className="max-w-2xl mx-auto px-6 py-16 flex justify-center">
             <div className="glass-card p-12 text-center w-full">
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4 text-rose-400 text-2xl">
-                ⚠
+              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4 text-rose-400">
+                <AlertCircle className="w-7 h-7" />
               </div>
               <p className="text-rose-400 font-bold text-base mb-5 text-center">{error || 'Resume not found'}</p>
               <Link to="/dashboard" className="btn-secondary btn-sm">
@@ -91,7 +94,7 @@ export default function ResumeDetailPage() {
             </div>
           </div>
         </div>
-      </div>
+      </AnimatedLayout>
     );
   }
 
@@ -102,7 +105,7 @@ export default function ResumeDetailPage() {
   };
 
   return (
-    <div className="vibrant-bg min-h-screen relative">
+    <AnimatedLayout className="vibrant-bg min-h-screen relative">
       <div className="vibrant-overlay" />
       <div className="relative z-10">
         <Navbar />
@@ -124,8 +127,8 @@ export default function ResumeDetailPage() {
 
             {/* Resume Header Card */}
             <div className="glass-card p-8 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-3xl shadow-inner mb-4">
-                📄
+              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-inner mb-4">
+                <FileText className="w-8 h-8" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight text-center mb-2">
                 {resume.fileName}
@@ -276,8 +279,8 @@ export default function ResumeDetailPage() {
 
             ) : resume.status === 'FAILED' ? (
               <div className="glass-card p-14 text-center flex flex-col items-center justify-center">
-                <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-3xl mx-auto mb-5">
-                  ❌
+                <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-5">
+                  <AlertCircle className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3 text-center">Analysis Unsuccessful</h3>
                 <p className="text-slate-400 text-sm max-w-md mx-auto mb-6 text-center leading-relaxed">
@@ -292,8 +295,8 @@ export default function ResumeDetailPage() {
 
             ) : (
               <div className="glass-card p-14 text-center flex flex-col items-center justify-center">
-                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-3xl mx-auto mb-5 animate-pulse">
-                  ⏳
+                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-5 animate-pulse">
+                  <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2 text-center">Analysis in Progress</h3>
                 <p className="text-slate-400 text-sm max-w-sm mx-auto text-center">
@@ -305,6 +308,6 @@ export default function ResumeDetailPage() {
           </div>
         </main>
       </div>
-    </div>
+    </AnimatedLayout>
   );
 }

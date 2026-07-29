@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import './App.css';
 import LandingPage      from './pages/LandingPage';
 import LoginPage        from './pages/LoginPage';
@@ -10,10 +11,11 @@ import CoverLetterPage  from './pages/CoverLetterPage';
 import AboutPage        from './pages/AboutPage';
 import ProtectedRoute   from './components/ProtectedRoute';
 
-function App() {
+function AnimatedRoutes() {
+  const location = useLocation();
   return (
-    <BrowserRouter>
-      <Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         {/* Public routes */}
         <Route path="/"          element={<LandingPage />} />
         <Route path="/login"     element={<LoginPage />}   />
@@ -26,6 +28,14 @@ function App() {
         <Route path="/resumes/:id"  element={<ProtectedRoute><ResumeDetailPage /></ProtectedRoute>} />
         <Route path="/cover-letter" element={<ProtectedRoute><CoverLetterPage /></ProtectedRoute>} />
       </Routes>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AnimatedRoutes />
     </BrowserRouter>
   );
 }
