@@ -1,23 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../lib/api';
 
 export default function CoverLetterPage() {
   const [searchParams] = useSearchParams();
-  const resumeId = searchParams.get('resumeId');
+  const initialResumeId = searchParams.get('resumeId') || '';
+  
+  const [resumes, setResumes] = useState<any[]>([]);
+  const [selectedResumeId, setSelectedResumeId] = useState(initialResumeId);
   const [jobDescription, setJobDescription] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Fetch all user resumes to populate the dropdown
+    api.get('/resumes').then(res => {
+      const fetchedResumes = res.data;
+      setResumes(fetchedResumes);
+      if (!selectedResumeId && fetchedResumes.length > 0) {
+        setSelectedResumeId(fetchedResumes[0].id);
+      }
+    }).catch(() => {
+      setError('Failed to load resumes. Please try again.');
+    });
+  }, [selectedResumeId]);
 
   const generateCoverLetter = async () => {
     if (!jobDescription.trim()) {
       setError('Please provide a job description.');
       return;
     }
-    if (!resumeId) {
-      setError('No resume selected. Please go back and select a resume.');
+    if (!selectedResumeId) {
+      setError('No resume selected. Please upload a resume first.');
       return;
     }
 
@@ -26,7 +42,7 @@ export default function CoverLetterPage() {
     
     try {
       const response = await api.post('/cover-letter/generate', {
-        resumeId,
+        resumeId: selectedResumeId,
         jobDescription
       });
       setCoverLetter(response.data.coverLetterMarkdown);
@@ -73,6 +89,24 @@ export default function CoverLetterPage() {
                 <h2 className="text-lg font-bold text-white tracking-tight">Target Job Description</h2>
               </div>
               
+              <div className="mb-4">
+                <label className="form-label">Select Candidate Resume</label>
+                <select
+                  value={selectedResumeId}
+                  onChange={(e) => setSelectedResumeId(e.target.value)}
+                  disabled={loading || resumes.length === 0}
+                  className="form-input bg-slate-900/60"
+                >
+                  {resumes.length === 0 && <option value="">No resumes found...</option>}
+                  {resumes.map(r => (
+                    <option key={r.id} value={r.id}>
+                      {r.fileName} (Uploaded: {new Date(r.uploadedAt).toLocaleDateString()})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <label className="form-label mt-2">Job Description</label>
               <textarea
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
@@ -85,8 +119,8 @@ export default function CoverLetterPage() {
               
               <button 
                 onClick={generateCoverLetter} 
-                disabled={loading || !resumeId}
-                className="btn-primary w-full py-4 text-base"
+                disabled={loading || !selectedResumeId}
+                className="btn-primary w-full py-4 text-base mt-auto flex-shrink-0"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

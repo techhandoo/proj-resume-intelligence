@@ -18,6 +18,7 @@ export default function Navbar() {
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/upload',    label: 'Upload'    },
     { to: '/about',     label: 'About'     },
+    { to: '/cover-letter', label: 'Cover Letter' },
   ];
 
   return (

@@ -129,14 +129,6 @@ export default function AboutPage() {
               recommendations — all powered by Groq's ultra-fast LLM inference.
             </p>
 
-            <div className="flex items-center justify-center gap-5 flex-wrap w-full">
-              <Link to="/upload" className="btn-primary px-9 py-3.5 text-sm shadow-lg shadow-blue-600/20">
-                Upload a Resume →
-              </Link>
-              <Link to="/dashboard" className="btn-secondary px-9 py-3.5 text-sm">
-                View Dashboard
-              </Link>
-            </div>
           </div>
 
           <div className="section-divider my-20" />
