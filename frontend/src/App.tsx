@@ -32,10 +32,13 @@ function AnimatedRoutes() {
   );
 }
 
+import Footer from './components/Footer';
+
 function App() {
   return (
     <BrowserRouter>
       <AnimatedRoutes />
+      <Footer />
     </BrowserRouter>
   );
 }
