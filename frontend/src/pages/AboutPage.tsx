@@ -106,32 +106,8 @@ export default function AboutPage() {
 
         <main className="max-w-[1440px] w-full mx-auto px-6 sm:px-12 py-16 flex flex-col items-center">
 
-          {/* ── 1. Hero — Forced x Right Shift ── */}
-          <div
-            className="text-center max-w-4xl w-full mb-20 flex flex-col items-center justify-center"
-            style={{ marginLeft: '160px' }}
-          >
-            <div className="flex justify-center mb-6">
-              <span className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold tracking-widest uppercase text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full shadow-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                Platform Overview
-              </span>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-8 text-center w-full">
-              About <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">PROJ</span>
-            </h1>
-
-            <p className="text-slate-400 text-[16px] sm:text-[17px] leading-[2.05] mb-10 text-center font-normal max-w-2xl mx-auto px-4">
-              PROJ is an <strong className="text-slate-200 font-semibold">AI-powered resume intelligence platform</strong> that automates
-              the extraction of candidate insights from resumes. Recruiters upload resumes and receive
-              structured skill breakdowns, experience estimates, education highlights, and improvement
-              recommendations — all powered by Groq's ultra-fast LLM inference.
-            </p>
-
-          </div>
-
-          <div className="section-divider my-20" />
+          {/* ── 1. Hero Section Removed ── */}
+          <div className="section-divider my-10" />
 
           {/* ── 2. How It Works — Symmetrical Grid ── */}
           <div className="mb-20">
