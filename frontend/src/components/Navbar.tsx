@@ -23,7 +23,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#05091a]/92 backdrop-blur-2xl">
+    <nav className="sticky top-0 z-50 border-b border-white/[0.08] bg-black/90 backdrop-blur-md">
       <div className="max-w-[1440px] mx-auto px-8 sm:px-14 flex items-center justify-between h-[68px]">
 
         {/* Brand */}
