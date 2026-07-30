@@ -93,16 +93,16 @@ export default function CoverLetterPage() {
       <main className="max-w-[1200px] mx-auto px-6 sm:px-10 py-10 w-full">
 
         {/* ── Breadcrumb ── */}
-        <div className="flex items-center gap-2 text-sm mb-8">
+        <div className="flex items-center justify-center gap-2 text-sm mb-6">
           <Link to="/dashboard" className="text-slate-500 hover:text-blue-400 transition-colors">Dashboard</Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
           <span className="text-white font-semibold">Cover Letter</span>
         </div>
 
         {/* ── Page Title ── */}
-        <div className="mb-8">
+        <div className="mb-10 text-center">
           <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">AI Cover Letter Generator</h1>
-          <p className="text-slate-400 text-[14px] leading-relaxed">
+          <p className="text-slate-400 text-[14px] leading-relaxed max-w-lg mx-auto">
             Select a resume, paste the job description, and Aura AI will write a tailored cover letter.
           </p>
         </div>

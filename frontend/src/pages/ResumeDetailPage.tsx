@@ -187,31 +187,29 @@ export default function ResumeDetailPage() {
       <main className="max-w-5xl mx-auto px-6 sm:px-10 py-10 w-full">
 
         {/* ── Breadcrumb ── */}
-        <div className="flex items-center gap-2 text-sm mb-8">
+        <div className="flex items-center justify-center gap-2 text-sm mb-6">
           <Link to="/dashboard" className="text-slate-500 hover:text-blue-400 transition-colors">Dashboard</Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
           <span className="text-white font-semibold truncate max-w-xs">{resume.fileName}</span>
         </div>
 
         {/* ── Header Card ── */}
-        <div className="glass-card p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mb-8">
-          <div className="flex items-center gap-5">
-            <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
-              <FileText className="w-7 h-7 text-slate-300" />
-            </div>
-            <div>
-              <h1 className="text-xl font-extrabold text-white tracking-tight mb-1.5">{resume.fileName}</h1>
-              <div className="flex items-center gap-3 flex-wrap">
-                <p className="text-xs text-zinc-500">
-                  Uploaded {new Date(resume.uploadedAt).toLocaleDateString('en-US', {
-                    month: 'long', day: 'numeric', year: 'numeric',
-                  })}
-                </p>
-                <span className={`badge border ${statusInfo.style}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
-                  {statusInfo.label}
-                </span>
-              </div>
+        <div className="glass-card p-7 flex flex-col items-center justify-center gap-5 mb-10 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0 mb-2">
+            <FileText className="w-7 h-7 text-slate-300" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-extrabold text-white tracking-tight mb-2">{resume.fileName}</h1>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <p className="text-xs text-zinc-500">
+                Uploaded {new Date(resume.uploadedAt).toLocaleDateString('en-US', {
+                  month: 'long', day: 'numeric', year: 'numeric',
+                })}
+              </p>
+              <span className={`badge border ${statusInfo.style}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
+                {statusInfo.label}
+              </span>
             </div>
           </div>
           {analysis && (

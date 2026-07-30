@@ -103,9 +103,9 @@ export default function AboutPage() {
       <main className="max-w-5xl mx-auto px-6 sm:px-10 py-10 w-full">
 
         {/* ── Page Title ── */}
-        <div className="mb-10">
+        <div className="mb-10 text-center flex flex-col items-center">
           <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">About the Platform</h1>
-          <p className="text-slate-400 text-[14px] leading-relaxed">
+          <p className="text-slate-400 text-[14px] leading-relaxed max-w-lg mx-auto">
             An end-to-end AI-powered resume intelligence system built with modern full-stack technologies.
           </p>
         </div>

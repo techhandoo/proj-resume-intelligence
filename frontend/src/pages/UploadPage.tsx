@@ -98,14 +98,14 @@ export default function UploadPage() {
           <div className="w-full max-w-2xl">
 
             {/* Page Header */}
-            <div className="text-left mb-12">
+            <div className="text-center mb-12 flex flex-col items-center">
               <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white mb-6 shadow-md">
                 <UploadCloud className="w-8 h-8" />
               </div>
               <h1 className="text-4xl font-extrabold text-white tracking-tight mb-4">
                 Upload Resume
               </h1>
-              <p className="text-zinc-400 text-[15px] leading-relaxed max-w-lg">
+              <p className="text-zinc-400 text-[15px] leading-relaxed max-w-lg mx-auto">
                 Drop a <span className="text-white font-semibold">.pdf</span> or{' '}
                 <span className="text-white font-semibold">.txt</span> file, or paste the
                 resume text below to launch automated AI analysis.
