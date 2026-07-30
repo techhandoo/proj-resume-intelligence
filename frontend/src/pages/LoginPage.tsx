@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { saveAuth } from '../lib/auth';
 import Logo from '../components/Logo';
+import AnimatedLayout from '../components/AnimatedLayout';
+import { Lock, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -28,12 +30,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="vibrant-bg min-h-screen flex items-center justify-center px-4 sm:px-6 relative overflow-hidden">
-      <div className="vibrant-overlay" />
-      <div className="hero-glow" />
-      <div className="hero-glow-secondary" />
-
-      <div className="relative z-10 w-full max-w-[520px] py-12">
+    <AnimatedLayout className="vibrant-bg min-h-screen flex items-center justify-center px-4 sm:px-6 relative overflow-hidden">
+      <div className="relative z-10 w-full max-w-[440px] py-12">
 
         {/* Brand Header */}
         <div className="flex justify-center mb-10">
@@ -44,9 +42,9 @@ export default function LoginPage() {
         <div className="auth-card">
 
           {/* Card Header */}
-          <div className="px-10 pt-10 pb-8 border-b border-white/[0.06] text-center">
-            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-2xl mx-auto mb-5">
-              🔐
+          <div className="px-10 pt-10 pb-8 border-b border-white/[0.04] text-center">
+            <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto mb-5">
+              <Lock className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight mb-3 text-center">
               Welcome back
@@ -60,8 +58,8 @@ export default function LoginPage() {
           <div className="px-10 py-9">
 
             {error && (
-              <div className="mb-7 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
-                <span className="text-rose-400 text-[18px] leading-none flex-shrink-0 mt-0.5">⚠</span>
+              <div className="mb-7 p-4 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
                 <p className="text-rose-400 text-sm font-medium leading-relaxed">{error}</p>
               </div>
             )}
@@ -98,10 +96,10 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
                     tabIndex={-1}
                   >
-                    {showPassword ? '🙈' : '👁'}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -114,7 +112,7 @@ export default function LoginPage() {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2.5">
-                      <span className="w-4 h-4 rounded-full border-2 border-white/25 border-t-white animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       Signing in...
                     </span>
                   ) : (
@@ -140,10 +138,10 @@ export default function LoginPage() {
         </div>
 
         {/* Trust note */}
-        <p className="text-center text-[12px] text-slate-600 mt-7 leading-relaxed">
+        <p className="text-center text-[12px] text-zinc-600 mt-7 leading-relaxed font-medium">
           Protected by enterprise-grade JWT encryption
         </p>
       </div>
-    </div>
+    </AnimatedLayout>
   );
 }

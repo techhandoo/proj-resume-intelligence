@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import AnimatedLayout from '../components/AnimatedLayout';
-import { FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { FileText, AlertCircle, Loader2, Download, Lightbulb, Search, TrendingUp, Sparkles } from 'lucide-react';
 import api from '../lib/api';
+import html2pdf from 'html2pdf.js';
 
 interface ResumeDetail {
   id: string;
@@ -58,6 +59,19 @@ export default function ResumeDetailPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const exportPDF = () => {
+    const element = document.getElementById('analysis-content');
+    if (!element) return;
+    const opt = {
+      margin: [0.5, 0.5] as [number, number],
+      filename: `Aura_Analysis_${resume?.fileName || 'Resume'}.pdf`,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+    };
+    html2pdf().set(opt).from(element).save();
   };
 
   if (loading) {
@@ -125,34 +139,42 @@ export default function ResumeDetailPage() {
           <div className="w-full space-y-8">
 
             {/* Resume Header Card */}
-            <div className="glass-card p-8 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-inner mb-4">
-                <FileText className="w-8 h-8" />
+            <div className="glass-card p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative">
+              <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+                <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shadow-inner">
+                  <FileText className="w-8 h-8" />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
+                    {resume.fileName}
+                  </h1>
+                  <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap">
+                    <p className="text-sm text-zinc-400">
+                      Uploaded{' '}
+                      {new Date(resume.uploadedAt).toLocaleDateString('en-US', {
+                        month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                      })}
+                    </p>
+                    <span className={`badge border ${statusInfo.style}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
+                      {statusInfo.label}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight text-center mb-2">
-                {resume.fileName}
-              </h1>
-              <p className="text-sm text-slate-400 text-center mb-4">
-                Uploaded{' '}
-                {new Date(resume.uploadedAt).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
-              <span className={`badge border ${statusInfo.style}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
-                {statusInfo.label}
-              </span>
+              
+              {analysis && (
+                <button onClick={exportPDF} className="btn-secondary flex-shrink-0 flex items-center gap-2 px-4 py-2" title="Download PDF Report">
+                  <Download className="w-4 h-4" /> Export PDF
+                </button>
+              )}
             </div>
 
             <div className="section-divider" />
 
             {/* Analysis Content */}
             {analysis ? (
-              <div className="space-y-8">
+              <div id="analysis-content" className="space-y-8 pb-4">
 
                 {/* Top Row: ATS Score & Executive Summary */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -181,7 +203,9 @@ export default function ResumeDetailPage() {
                   {/* Executive Summary */}
                   <div className="glass-card p-8 flex flex-col justify-center lg:col-span-2">
                     <div className="flex items-center gap-3 mb-4">
-                      <span className="w-8 h-8 rounded-lg bg-blue-500/15 border border-blue-500/25 flex items-center justify-center text-blue-400">📝</span>
+                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
+                        <FileText className="w-5 h-5" />
+                      </span>
                       <h2 className="text-lg font-bold text-white tracking-tight">Executive Summary</h2>
                     </div>
                     <p className="text-slate-300 leading-relaxed text-[15px] font-normal">
@@ -195,7 +219,9 @@ export default function ResumeDetailPage() {
                   {/* Extracted Skills */}
                   <div className="glass-card p-7 lg:col-span-2">
                     <div className="flex items-center gap-3 mb-5">
-                      <span className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-emerald-400">💡</span>
+                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
+                        <Lightbulb className="w-5 h-5" />
+                      </span>
                       <h2 className="text-lg font-bold text-white tracking-tight">Technical & Soft Skills</h2>
                     </div>
                     <div className="flex flex-wrap gap-2.5">
@@ -225,7 +251,9 @@ export default function ResumeDetailPage() {
                   {/* Key Insights */}
                   <div className="glass-card p-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <span className="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-400">🔍</span>
+                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
+                        <Search className="w-5 h-5" />
+                      </span>
                       <h2 className="text-lg font-bold text-white tracking-tight">Key Insights</h2>
                     </div>
                     <ul className="space-y-4">
@@ -240,7 +268,9 @@ export default function ResumeDetailPage() {
                   {/* Actionable Improvements */}
                   <div className="glass-card p-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <span className="w-8 h-8 rounded-lg bg-rose-500/15 border border-rose-500/25 flex items-center justify-center text-rose-400">📈</span>
+                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
+                        <TrendingUp className="w-5 h-5" />
+                      </span>
                       <h2 className="text-lg font-bold text-white tracking-tight">Actionable Improvements</h2>
                     </div>
                     <ul className="space-y-4">
@@ -261,9 +291,9 @@ export default function ResumeDetailPage() {
                 </div>
 
                 {/* Action Row */}
-                <div className="flex justify-center pt-4">
-                  <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary">
-                    ✨ Generate Cover Letter
+                <div className="flex justify-center pt-4" data-html2canvas-ignore="true">
+                  <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" /> Generate Cover Letter
                   </Link>
                 </div>
 

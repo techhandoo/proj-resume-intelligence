@@ -31,16 +31,18 @@ export default function LandingPage() {
       <div className="hero-glow" />
       <div className="hero-glow-secondary" />
 
-      {/* ── Navbar ── */}
-      <header className="relative z-10 border-b border-white/[0.05]">
-        <div className="max-w-[1440px] mx-auto px-8 sm:px-14 flex items-center justify-between h-[72px]">
-          <Logo size="sm" href="/" />
-          <div className="flex items-center gap-4">
-            <Link to="/login" className="btn-secondary btn-sm">
+      {/* ── Floating Navbar ── */}
+      <header className="fixed top-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+        <div className="pointer-events-auto bg-black/80 backdrop-blur-lg border border-white/10 rounded-full px-2 py-2 flex items-center justify-between shadow-2xl shadow-black/50 w-full max-w-4xl">
+          <div className="ml-2">
+            <Logo size="sm" href="/" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Link to="/login" className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-zinc-400 hover:text-white hover:bg-white/5 transition-all">
               Sign In
             </Link>
-            <Link to="/register" className="btn-primary btn-sm">
-              Get Started →
+            <Link to="/register" className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold bg-white text-black hover:bg-zinc-200 transition-all shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+              Get Started
             </Link>
           </div>
         </div>
@@ -91,28 +93,60 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Feature Cards Section — Symmetrical Grid */}
-        <div className="w-full max-w-[1440px] mx-auto">
-          <div className="section-divider mb-16" />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
-            {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className="glass-card glass-card-hover px-8 py-10 text-center flex flex-col items-center justify-center animate-fade-in-up"
-                style={{ animationDelay: `${0.42 + index * 0.14}s` }}
-              >
-                <div className={`w-16 h-16 rounded-2xl ${feature.iconBg} border flex items-center justify-center text-3xl mb-6 shadow-md`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-[18px] font-bold text-white mb-3 tracking-tight text-center">
-                  {feature.title}
+        {/* Feature Cards Section — Bento Grid */}
+        <div className="w-full max-w-[1000px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+            
+            {/* Feature 1 (Spans 2 columns) */}
+            <div
+              className="md:col-span-2 glass-card glass-card-hover p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center gap-8 animate-fade-in-up"
+              style={{ animationDelay: '0.42s' }}
+            >
+              <div className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-2xl ${features[0].iconBg} border flex items-center justify-center text-3xl shadow-md`}>
+                {features[0].icon}
+              </div>
+              <div className="text-left">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-tight">
+                  {features[0].title}
                 </h3>
-                <p className="text-slate-400 text-[14px] leading-[1.9] text-center">
-                  {feature.description}
+                <p className="text-zinc-400 text-[15px] sm:text-base leading-relaxed">
+                  {features[0].description}
                 </p>
               </div>
-            ))}
+            </div>
+
+            {/* Feature 2 (Spans 1 column) */}
+            <div
+              className="md:col-span-1 glass-card glass-card-hover p-8 flex flex-col items-start animate-fade-in-up"
+              style={{ animationDelay: '0.56s' }}
+            >
+              <div className={`w-14 h-14 rounded-2xl ${features[1].iconBg} border flex items-center justify-center text-2xl mb-6 shadow-md`}>
+                {features[1].icon}
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3 tracking-tight text-left">
+                {features[1].title}
+              </h3>
+              <p className="text-zinc-400 text-[14px] leading-relaxed text-left">
+                {features[1].description}
+              </p>
+            </div>
+
+            {/* Feature 3 (Spans 1 column) */}
+            <div
+              className="md:col-span-1 glass-card glass-card-hover p-8 flex flex-col items-start animate-fade-in-up"
+              style={{ animationDelay: '0.70s' }}
+            >
+              <div className={`w-14 h-14 rounded-2xl ${features[2].iconBg} border flex items-center justify-center text-2xl mb-6 shadow-md`}>
+                {features[2].icon}
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3 tracking-tight text-left">
+                {features[2].title}
+              </h3>
+              <p className="text-zinc-400 text-[14px] leading-relaxed text-left">
+                {features[2].description}
+              </p>
+            </div>
+
           </div>
         </div>
 

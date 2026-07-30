@@ -110,30 +110,30 @@ export default function AboutPage() {
           {/* ── 1. Hero Section Removed ── */}
           <div className="section-divider my-10" />
 
-          {/* ── 2. How It Works — Symmetrical Grid ── */}
-          <div className="mb-20">
+          {/* ── 2. How It Works — Bento Grid ── */}
+          <div className="mb-20 w-full">
             <div className="text-center mb-14">
               <h2 className="text-3xl font-extrabold text-white tracking-tight mb-4 text-center">
                 How It Works
               </h2>
-              <p className="text-slate-400 text-[15px] leading-[1.85] max-w-xl mx-auto text-center">
+              <p className="text-zinc-400 text-[15px] leading-[1.85] max-w-xl mx-auto text-center">
                 A fully asynchronous pipeline from upload to AI-generated insights
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {features.map((f) => (
                 <div
                   key={f.title}
-                  className="glass-card px-8 py-10 glass-card-hover flex flex-col items-center text-center justify-center"
+                  className="glass-card p-8 glass-card-hover flex flex-col items-start transition-all transform hover:-translate-y-1"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-3xl mb-6 shadow-md">
+                  <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl mb-6 shadow-md text-white">
                     {f.icon}
                   </div>
-                  <h3 className="text-[17px] font-bold text-white mb-3 text-center tracking-tight">
+                  <h3 className="text-[17px] font-bold text-white mb-3 tracking-tight">
                     {f.title}
                   </h3>
-                  <p className="text-slate-400 text-[14px] leading-[1.9] text-center">
+                  <p className="text-zinc-400 text-[14px] leading-relaxed">
                     {f.desc}
                   </p>
                 </div>
@@ -154,20 +154,20 @@ export default function AboutPage() {
                 Architecture
               </h3>
 
-              <p className="text-slate-400 text-[15px] sm:text-[16px] leading-[2.05] mb-8 text-center max-w-2xl mx-auto font-normal px-2">
-                PROJ uses a <strong className="text-slate-200 font-semibold">layered MVC architecture</strong> on the backend
+              <p className="text-zinc-400 text-[15px] sm:text-[16px] leading-[2.05] mb-10 text-center max-w-2xl mx-auto font-normal px-2">
+                Aura AI uses a <strong className="text-white font-semibold">layered MVC architecture</strong> on the backend
                 with a clear separation between controllers, services, and repositories.
-                The AI pipeline is fully decoupled via <strong className="text-slate-200 font-semibold">RabbitMQ</strong> — uploads are
+                The AI pipeline is fully decoupled via <strong className="text-white font-semibold">RabbitMQ</strong> — uploads are
                 accepted instantly, then processed asynchronously so the API stays responsive.
-                The frontend communicates through a <strong className="text-slate-200 font-semibold">Vite proxy</strong> in development
+                The frontend communicates through a <strong className="text-white font-semibold">Vite proxy</strong> in development
                 and can be served as a static bundle behind a reverse proxy in production.
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs font-semibold w-full">
                 {['React', '→', 'Vite Proxy', '→', 'Spring Boot', '→', 'RabbitMQ', '→', 'AI Worker', '→', 'Groq LLM'].map((s, i) => (
                   s === '→'
-                    ? <span key={i} className="text-slate-600 text-base">→</span>
-                    : <span key={i} className="px-3.5 py-1.5 bg-slate-800/80 border border-slate-700/60 rounded-xl text-slate-300 shadow-sm">{s}</span>
+                    ? <span key={i} className="text-zinc-600 text-base font-light">→</span>
+                    : <span key={i} className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-300 shadow-sm">{s}</span>
                 ))}
               </div>
             </div>
@@ -186,11 +186,11 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 w-full">
               {techStack.map((section) => {
                 const c = colorMap[section.color];
                 return (
-                  <div key={section.category} className={`glass-card overflow-hidden border ${c.border}`}>
+                  <div key={section.category} className={`glass-card overflow-hidden border ${c.border} transition-all hover:-translate-y-1`}>
                     {/* Section header */}
                     <div className={`px-8 py-5 border-b ${c.border} ${c.bg} flex items-center justify-between`}>
                       <div className="flex items-center gap-3.5">
@@ -205,14 +205,13 @@ export default function AboutPage() {
                     </div>
 
                     {/* Tech items */}
-                    <div className="px-8 py-6 space-y-4">
+                    <div className="px-8 py-8 space-y-6">
                       {section.items.map((item, i) => (
                         <div key={i} className="flex items-start gap-4">
-                          <div className={`w-2.5 h-2.5 rounded-full ${c.dot} flex-shrink-0 mt-[6px]`} />
-                          <div className="text-left">
-                            <span className="text-[14px] font-bold text-white">{item.name}</span>
-                            <span className="text-slate-500 mx-2 text-xs">—</span>
-                            <span className="text-[13.5px] text-slate-400 leading-[1.75]">{item.desc}</span>
+                          <div className={`w-2.5 h-2.5 rounded-full ${c.dot} flex-shrink-0 mt-[6px] shadow-[0_0_8px_currentColor]`} style={{ color: 'inherit' }} />
+                          <div className="text-left flex-1">
+                            <h4 className="text-[14px] font-bold text-white mb-1">{item.name}</h4>
+                            <p className="text-[13.5px] text-zinc-400 leading-relaxed">{item.desc}</p>
                           </div>
                         </div>
                       ))}

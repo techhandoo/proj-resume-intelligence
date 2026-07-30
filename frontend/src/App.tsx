@@ -37,7 +37,9 @@ import Footer from './components/Footer';
 function App() {
   return (
     <BrowserRouter>
-      <AnimatedRoutes />
+      <div className="pb-24 min-h-screen">
+        <AnimatedRoutes />
+      </div>
       <Footer />
     </BrowserRouter>
   );

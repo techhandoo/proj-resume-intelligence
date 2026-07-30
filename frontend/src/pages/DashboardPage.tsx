@@ -48,10 +48,10 @@ export default function DashboardPage() {
   };
 
   const statCards = [
-    { label: 'Total Resumes',     value: stats.total,      gradient: 'from-blue-400 to-blue-500',     icon: <FileText className="w-6 h-6 text-blue-400" />, iconBg: 'bg-blue-500/10 border-blue-500/20',    accent: 'hover:border-blue-500/25'    },
-    { label: 'Analyzed',          value: stats.analyzed,   gradient: 'from-emerald-400 to-teal-400',  icon: <CheckCircle className="w-6 h-6 text-emerald-400" />, iconBg: 'bg-emerald-500/10 border-emerald-500/20', accent: 'hover:border-emerald-500/25' },
-    { label: 'In Queue',          value: stats.processing, gradient: 'from-amber-400 to-orange-400',  icon: <Hourglass className="w-6 h-6 text-amber-400" />, iconBg: 'bg-amber-500/10 border-amber-500/20',   accent: 'hover:border-amber-500/25'   },
-    { label: 'Failed',            value: stats.failed,     gradient: 'from-rose-400 to-pink-500',     icon: <AlertTriangle className="w-6 h-6 text-rose-400" />, iconBg: 'bg-rose-500/10 border-rose-500/20',     accent: 'hover:border-rose-500/25'    },
+    { label: 'Total Resumes',     value: stats.total,      gradient: 'from-blue-400 to-indigo-400',   icon: <FileText className="w-5 h-5 text-blue-400" />, iconBg: 'bg-blue-500/10 border-blue-500/20',    accent: 'hover:border-blue-500/30 hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]'    },
+    { label: 'Analyzed',          value: stats.analyzed,   gradient: 'from-emerald-400 to-teal-400',  icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, iconBg: 'bg-emerald-500/10 border-emerald-500/20', accent: 'hover:border-emerald-500/30 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]' },
+    { label: 'In Queue',          value: stats.processing, gradient: 'from-amber-400 to-orange-400',  icon: <Hourglass className="w-5 h-5 text-amber-400" />, iconBg: 'bg-amber-500/10 border-amber-500/20',   accent: 'hover:border-amber-500/30 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]'   },
+    { label: 'Failed',            value: stats.failed,     gradient: 'from-rose-400 to-pink-500',     icon: <AlertTriangle className="w-5 h-5 text-rose-400" />, iconBg: 'bg-rose-500/10 border-rose-500/20',     accent: 'hover:border-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]'    },
   ];
 
   const containerVariants: Variants = {
@@ -100,16 +100,16 @@ export default function DashboardPage() {
             className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10"
           >
             {statCards.map((stat) => (
-              <motion.div variants={itemVariants} key={stat.label} className={`stat-card ${stat.accent}`}>
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+              <motion.div variants={itemVariants} key={stat.label} className={`stat-card transition-all duration-300 transform hover:-translate-y-1 ${stat.accent}`}>
+                <div className="space-y-1.5 text-left">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                     {stat.label}
                   </p>
-                  <p className={`text-[2.2rem] font-black leading-none bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                  <p className={`text-[2.2rem] font-black leading-none tracking-tight bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
                     {stat.value}
                   </p>
                 </div>
-                <div className={`w-12 h-12 rounded-xl ${stat.iconBg} border flex items-center justify-center flex-shrink-0`}>
+                <div className={`w-11 h-11 rounded-xl ${stat.iconBg} border flex items-center justify-center flex-shrink-0`}>
                   {stat.icon}
                 </div>
               </motion.div>
@@ -122,12 +122,12 @@ export default function DashboardPage() {
           <div className="glass-card overflow-hidden">
 
             {/* Header Bar */}
-            <div className="px-8 py-5 border-b border-white/[0.05] flex items-center justify-between bg-white/[0.012]">
+            <div className="px-8 py-5 border-b border-white/[0.05] flex items-center justify-between bg-black/40 backdrop-blur-md">
               <h2 className="text-[15px] font-bold text-white flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
                 Resume Records
               </h2>
-              <span className="text-[12px] font-semibold text-slate-500 bg-slate-800/60 px-3.5 py-1.5 rounded-full border border-slate-700/50">
+              <span className="text-[12px] font-semibold text-zinc-400 bg-zinc-900 px-3.5 py-1.5 rounded-full border border-zinc-800">
                 {resumes.length} {resumes.length === 1 ? 'entry' : 'entries'}
               </span>
             </div>
@@ -192,14 +192,14 @@ export default function DashboardPage() {
                         <tr key={resume.id}>
                           <td>
                             <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-xl bg-slate-800/70 border border-slate-700/50 flex items-center justify-center flex-shrink-0">
-                                📄
+                              <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
+                                <FileText className="w-5 h-5 text-zinc-400" />
                               </div>
-                              <div className="space-y-1">
+                              <div className="space-y-1 text-left">
                                 <p className="text-white font-semibold text-[14px] leading-tight">
                                   {resume.fileName}
                                 </p>
-                                <p className="text-[11px] text-slate-500 font-mono">
+                                <p className="text-[11px] text-zinc-500 font-mono">
                                   #{resume.id.substring(0, 8)}
                                 </p>
                               </div>

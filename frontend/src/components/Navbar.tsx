@@ -23,8 +23,8 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/[0.08] bg-black/90 backdrop-blur-md">
-      <div className="max-w-[1440px] mx-auto px-8 sm:px-14 flex items-center justify-between h-[68px]">
+    <nav className="fixed top-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+      <div className="pointer-events-auto bg-black/80 backdrop-blur-lg border border-white/10 rounded-full px-2 py-2 flex items-center justify-between shadow-2xl shadow-black/50 w-full max-w-4xl">
 
         {/* Brand */}
         <Logo size="sm" href="/dashboard" />
@@ -35,10 +35,10 @@ export default function Navbar() {
             <Link
               key={to}
               to={to}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold tracking-wide transition-all duration-200 ${
                 isActive(to)
-                  ? 'text-white bg-blue-500/15 border border-blue-500/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
+                  ? 'text-white bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
               }`}
             >
               {icon}

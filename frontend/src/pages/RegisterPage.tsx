@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { saveAuth } from '../lib/auth';
 import Logo from '../components/Logo';
+import AnimatedLayout from '../components/AnimatedLayout';
+import { Sparkles, AlertCircle, Check, X, Eye, EyeOff, Loader2, Circle } from 'lucide-react';
 
 function getPasswordStrength(password: string) {
   const checks = [
@@ -57,12 +59,8 @@ export default function RegisterPage() {
     isTouched ? (isValid ? 'border-emerald-500/40 focus:border-emerald-500/60' : 'border-rose-500/40 focus:border-rose-500/60') : '';
 
   return (
-    <div className="vibrant-bg min-h-screen flex items-center justify-center px-4 sm:px-6 relative overflow-hidden">
-      <div className="vibrant-overlay" />
-      <div className="hero-glow" />
-      <div className="hero-glow-secondary" />
-
-      <div className="relative z-10 w-full max-w-[540px] py-12">
+    <AnimatedLayout className="vibrant-bg min-h-screen flex items-center justify-center px-4 sm:px-6 relative overflow-hidden">
+      <div className="relative z-10 w-full max-w-[480px] py-12">
 
         {/* Brand Header */}
         <div className="flex justify-center mb-10">
@@ -73,15 +71,15 @@ export default function RegisterPage() {
         <div className="auth-card">
 
           {/* Card Header */}
-          <div className="px-10 pt-10 pb-8 border-b border-white/[0.06] text-center">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl mx-auto mb-5">
-              ✨
+          <div className="px-10 pt-10 pb-8 border-b border-white/[0.04] text-center">
+            <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto mb-5">
+              <Sparkles className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight mb-3 text-center">
               Create your account
             </h1>
-            <p className="text-slate-400 text-[15px] leading-relaxed font-normal text-center max-w-sm mx-auto">
-              Get started with AI-powered resume intelligence — completely free
+            <p className="text-zinc-400 text-[15px] leading-relaxed font-medium text-center max-w-sm mx-auto">
+              Get started with Aura AI — completely free
             </p>
           </div>
 
@@ -89,8 +87,8 @@ export default function RegisterPage() {
           <div className="px-10 py-9">
 
             {error && (
-              <div className="mb-7 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
-                <span className="text-rose-400 text-[18px] leading-none flex-shrink-0 mt-0.5">⚠</span>
+              <div className="mb-7 p-4 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
                 <p className="text-rose-400 text-sm font-medium leading-relaxed">{error}</p>
               </div>
             )}
@@ -102,8 +100,8 @@ export default function RegisterPage() {
                 <div className="flex items-center justify-between mb-2">
                   <label htmlFor="fullName" className="form-label mb-0">Full Name</label>
                   {touched.fullName && (
-                    <span className={`text-[11px] font-semibold ${nameValid ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {nameValid ? '✓ Looks good' : 'Min. 2 characters'}
+                    <span className={`text-[11px] font-semibold flex items-center gap-1 ${nameValid ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {nameValid ? <><Check className="w-3 h-3" /> Looks good</> : 'Min. 2 characters'}
                     </span>
                   )}
                 </div>
@@ -121,7 +119,7 @@ export default function RegisterPage() {
                   />
                   {touched.fullName && (
                     <span className={`absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold ${nameValid ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {nameValid ? '✓' : '✗'}
+                      {nameValid ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
                     </span>
                   )}
                 </div>
@@ -135,8 +133,8 @@ export default function RegisterPage() {
                 <div className="flex items-center justify-between mb-2">
                   <label htmlFor="email" className="form-label mb-0">Work Email</label>
                   {touched.email && (
-                    <span className={`text-[11px] font-semibold ${emailValid ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {emailValid ? '✓ Valid email' : 'Invalid format'}
+                    <span className={`text-[11px] font-semibold flex items-center gap-1 ${emailValid ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {emailValid ? <><Check className="w-3 h-3" /> Valid email</> : 'Invalid format'}
                     </span>
                   )}
                 </div>
@@ -154,7 +152,7 @@ export default function RegisterPage() {
                   />
                   {touched.email && (
                     <span className={`absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold ${emailValid ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {emailValid ? '✓' : '✗'}
+                      {emailValid ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
                     </span>
                   )}
                 </div>
@@ -187,10 +185,10 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
                     tabIndex={-1}
                   >
-                    {showPassword ? '🙈' : '👁'}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
 
@@ -210,10 +208,10 @@ export default function RegisterPage() {
                     <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
                       {strength.checks.map((check) => (
                         <div key={check.label} className="flex items-center gap-2">
-                          <span className={`text-xs font-bold ${check.passed ? 'text-emerald-400' : 'text-slate-600'}`}>
-                            {check.passed ? '✓' : '○'}
+                          <span className={`flex-shrink-0 ${check.passed ? 'text-emerald-400' : 'text-zinc-600'}`}>
+                            {check.passed ? <Check className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
                           </span>
-                          <span className={`text-[12px] leading-relaxed ${check.passed ? 'text-slate-300' : 'text-slate-500'}`}>
+                          <span className={`text-[12px] leading-relaxed ${check.passed ? 'text-zinc-300' : 'text-zinc-500'}`}>
                             {check.label}
                           </span>
                         </div>
@@ -238,7 +236,7 @@ export default function RegisterPage() {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2.5">
-                      <span className="w-4 h-4 rounded-full border-2 border-white/25 border-t-white animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       Creating account...
                     </span>
                   ) : (
@@ -263,10 +261,10 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <p className="text-center text-[12px] text-slate-600 mt-7 leading-relaxed">
+        <p className="text-center text-[12px] text-zinc-600 mt-7 leading-relaxed font-medium">
           By registering, you agree to our Terms of Service
         </p>
       </div>
-    </div>
+    </AnimatedLayout>
   );
 }

@@ -103,17 +103,17 @@ export default function UploadPage() {
           <div className="w-full max-w-2xl">
 
             {/* Page Header */}
-            <div className="text-center mb-12">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-6">
+            <div className="text-left mb-12">
+              <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white mb-6 shadow-md">
                 <UploadCloud className="w-8 h-8" />
               </div>
               <h1 className="text-4xl font-extrabold text-white tracking-tight mb-4">
                 Upload Resume
               </h1>
-              <p className="text-slate-400 text-[15px] leading-[1.85] max-w-md mx-auto">
-                Drop a <span className="text-blue-400 font-medium">.pdf</span> or{' '}
-                <span className="text-blue-400 font-medium">.txt</span> file, or paste the
-                resume text below to launch automated AI analysis
+              <p className="text-zinc-400 text-[15px] leading-relaxed max-w-lg">
+                Drop a <span className="text-white font-semibold">.pdf</span> or{' '}
+                <span className="text-white font-semibold">.txt</span> file, or paste the
+                resume text below to launch automated AI analysis.
               </p>
             </div>
 
@@ -135,7 +135,7 @@ export default function UploadPage() {
               <div className="glass-card px-8 py-7">
                 <label htmlFor="fileName" className="form-label">
                   Resume Title / Candidate Name
-                  <span className="text-blue-400 ml-1 normal-case tracking-normal font-normal text-xs">(required)</span>
+                  <span className="text-zinc-500 ml-1 normal-case tracking-normal font-normal text-xs">(required)</span>
                 </label>
                 <input
                   id="fileName"
@@ -146,7 +146,7 @@ export default function UploadPage() {
                   className="form-input"
                   placeholder="e.g. Sarah_Jenkins_FullStack_Resume"
                 />
-                <p className="mt-2.5 text-xs text-slate-500 leading-relaxed">
+                <p className="mt-2.5 text-xs text-zinc-500 leading-relaxed">
                   This identifier appears in your dashboard resume list
                 </p>
               </div>
@@ -162,28 +162,28 @@ export default function UploadPage() {
                 <div
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
-                  className="mb-6 border-2 border-dashed border-slate-700/50 hover:border-blue-500/50 rounded-2xl py-10 px-6 text-center bg-slate-900/25 hover:bg-blue-500/[0.03] transition-all cursor-pointer group"
+                  className="mb-6 border border-dashed border-white/20 hover:border-white/40 rounded-2xl py-10 px-6 text-center bg-black/40 hover:bg-white/5 transition-all cursor-pointer group"
                 >
                   {parsing ? (
                     <div className="flex flex-col items-center gap-4">
-                      <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-                      <p className="text-sm font-semibold text-blue-400">Extracting text from PDF...</p>
-                      <p className="text-xs text-slate-500">This may take a moment for large files</p>
+                      <Loader2 className="w-10 h-10 text-white animate-spin" />
+                      <p className="text-sm font-semibold text-zinc-300">Extracting text from PDF...</p>
+                      <p className="text-xs text-zinc-500">This may take a moment for large files</p>
                     </div>
                   ) : (
                     <>
-                      <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
                         <UploadCloud className="w-7 h-7" />
                       </div>
-                      <p className="text-base font-semibold text-slate-200 mb-2">
+                      <p className="text-base font-semibold text-white mb-2">
                         Drag &amp; drop your resume here
                       </p>
-                      <p className="text-sm text-slate-500 mb-1 leading-relaxed">
-                        Supports <span className="text-red-400 font-medium">.pdf</span> and{' '}
-                        <span className="text-blue-400 font-medium">.txt</span> files
+                      <p className="text-sm text-zinc-400 mb-1 leading-relaxed">
+                        Supports <span className="text-white font-medium">.pdf</span> and{' '}
+                        <span className="text-white font-medium">.txt</span> files
                       </p>
-                      <p className="text-xs text-slate-600 mb-6">PDF text is extracted automatically in the browser</p>
-                      <label className="btn-ghost btn-sm cursor-pointer">
+                      <p className="text-xs text-zinc-600 mb-6">PDF text is extracted automatically in the browser</p>
+                      <label className="btn-secondary btn-sm cursor-pointer">
                         Browse Files
                         <input
                           type="file"
@@ -232,7 +232,7 @@ export default function UploadPage() {
 
                 {/* Counter */}
                 <div className="flex items-center justify-between mt-3.5">
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-zinc-500">
                     {content.length > 0
                       ? `${content.length.toLocaleString()} characters`
                       : 'Supports plain text and PDF-extracted content'}
@@ -265,7 +265,7 @@ export default function UploadPage() {
               </button>
 
               {!isReady && !parsing && (
-                <p className="text-center text-xs text-slate-600 -mt-2">
+                <p className="text-center text-xs text-zinc-600 font-medium -mt-2">
                   Fill in both the title and resume content to enable submission
                 </p>
               )}
