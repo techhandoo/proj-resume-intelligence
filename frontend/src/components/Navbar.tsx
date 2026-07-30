@@ -12,7 +12,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full px-6 py-4 flex items-center justify-between pointer-events-auto">
+    <nav className="sticky top-0 z-40 w-full px-6 py-4 flex items-center justify-between pointer-events-auto bg-[#030712]/80 backdrop-blur-xl border-b border-white/[0.04]">
       {/* Search / Left Side */}
       <div className="flex-1 flex items-center">
         <div className="relative w-full max-w-md hidden sm:block">

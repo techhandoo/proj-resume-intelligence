@@ -23,7 +23,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-[#030712] flex">
       <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
-      <div className={`flex-1 flex flex-col min-h-screen overflow-x-hidden transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-20' : 'ml-64'}`}>
+      <div className={`flex-1 flex flex-col min-h-screen overflow-x-hidden transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-16' : 'ml-60'}`}>
         {/* We place the Navbar here so it sits at the top of the main content area */}
         <Navbar />
         <AnimatedLayout className="flex-1 flex flex-col pt-2">
