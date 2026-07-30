@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import AnimatedLayout from '../components/AnimatedLayout';
-import { FileText, AlertCircle, Loader2, Download, Lightbulb, Search, TrendingUp, Sparkles } from 'lucide-react';
+import AppLayout from '../components/AppLayout';
+import { FileText, AlertCircle, Loader2, Download, TrendingUp, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
 import api from '../lib/api';
 import html2pdf from 'html2pdf.js';
 
@@ -28,11 +27,48 @@ interface AnalysisDetail {
 }
 
 const statusConfig: Record<string, { label: string; style: string; dot: string }> = {
-  UPLOADED: { label: 'Uploaded', style: 'text-amber-400 bg-amber-500/10 border-amber-500/30', dot: 'bg-amber-400' },
-  PROCESSING: { label: 'Processing', style: 'text-blue-400 bg-blue-500/10 border-blue-500/30 animate-pulse', dot: 'bg-blue-400' },
-  ANALYZED: { label: 'Analyzed', style: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
-  FAILED: { label: 'Failed', style: 'text-rose-400 bg-rose-500/10 border-rose-500/30', dot: 'bg-rose-400' },
+  UPLOADED:   { label: 'Uploaded',   style: 'text-amber-400 bg-amber-500/10 border-amber-500/30',  dot: 'bg-amber-400'  },
+  PROCESSING: { label: 'Processing', style: 'text-blue-400 bg-blue-500/10 border-blue-500/30 animate-pulse', dot: 'bg-blue-400'   },
+  ANALYZED:   { label: 'Analyzed',   style: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
+  FAILED:     { label: 'Failed',     style: 'text-rose-400 bg-rose-500/10 border-rose-500/30',      dot: 'bg-rose-400'   },
 };
+
+function ScoreGauge({ score }: { score: number }) {
+  const radius = 56;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (circumference * score) / 100;
+  const color = score > 75 ? '#34d399' : score > 50 ? '#fbbf24' : '#f87171';
+  const label = score > 75 ? 'Great' : score > 50 ? 'Fair' : 'Needs Work';
+  const labelColor = score > 75 ? 'text-emerald-400' : score > 50 ? 'text-amber-400' : 'text-rose-400';
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <div className="relative w-36 h-36 flex items-center justify-center">
+        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 128 128">
+          <circle cx="64" cy="64" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+          <circle
+            cx="64" cy="64" r={radius}
+            fill="none"
+            stroke={color}
+            strokeWidth="10"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1)', filter: `drop-shadow(0 0 8px ${color}60)` }}
+          />
+        </svg>
+        <div className="z-10 text-center">
+          <span className="text-4xl font-black text-white leading-none">{score}</span>
+          <span className="text-xs text-slate-500 font-medium block mt-0.5">/ 100</span>
+        </div>
+      </div>
+      <div className="text-center">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">ATS Score</p>
+        <span className={`text-sm font-bold ${labelColor}`}>{label}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function ResumeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -49,12 +85,11 @@ export default function ResumeDetailPage() {
     try {
       const resumeRes = await api.get(`/resumes/${id}`);
       setResume(resumeRes.data);
-
       if (resumeRes.data.hasAnalysis) {
         const analysisRes = await api.get(`/resumes/${id}/analysis`);
         setAnalysis(analysisRes.data);
       }
-    } catch (err: any) {
+    } catch {
       setError('Failed to load resume details.');
     } finally {
       setLoading(false);
@@ -64,50 +99,39 @@ export default function ResumeDetailPage() {
   const exportPDF = () => {
     const element = document.getElementById('analysis-content');
     if (!element) return;
-    const opt = {
+    html2pdf().set({
       margin: [0.5, 0.5] as [number, number],
-      filename: `Aura_Analysis_${resume?.fileName || 'Resume'}.pdf`,
+      filename: `Analysis_${resume?.fileName || 'Resume'}.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
-    };
-    html2pdf().set(opt).from(element).save();
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const },
+    }).from(element).save();
   };
 
   if (loading) {
     return (
-      <AnimatedLayout className="vibrant-bg min-h-screen relative">
-        <div className="vibrant-overlay" />
-        <div className="relative z-10">
-          <Navbar />
-          <div className="flex flex-col items-center justify-center py-40 gap-5">
-            <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-            <p className="text-slate-400 font-medium text-sm">Loading resume details...</p>
-          </div>
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center py-40 gap-5">
+          <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+          <p className="text-slate-400 font-medium text-sm">Loading resume details...</p>
         </div>
-      </AnimatedLayout>
+      </AppLayout>
     );
   }
 
   if (error || !resume) {
     return (
-      <AnimatedLayout className="vibrant-bg min-h-screen relative">
-        <div className="vibrant-overlay" />
-        <div className="relative z-10">
-          <Navbar />
-          <div className="max-w-2xl mx-auto px-6 py-16 flex justify-center">
-            <div className="glass-card p-12 text-center w-full">
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4 text-rose-400">
-                <AlertCircle className="w-7 h-7" />
-              </div>
-              <p className="text-rose-400 font-bold text-base mb-5 text-center">{error || 'Resume not found'}</p>
-              <Link to="/dashboard" className="btn-secondary btn-sm">
-                ← Back to Dashboard
-              </Link>
+      <AppLayout>
+        <div className="max-w-2xl mx-auto px-6 py-16 flex justify-center">
+          <div className="glass-card p-12 text-center w-full">
+            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4 text-rose-400">
+              <AlertCircle className="w-7 h-7" />
             </div>
+            <p className="text-rose-400 font-bold text-base mb-5">{error || 'Resume not found'}</p>
+            <Link to="/dashboard" className="btn-secondary btn-sm">← Back to Dashboard</Link>
           </div>
         </div>
-      </AnimatedLayout>
+      </AppLayout>
     );
   }
 
@@ -117,226 +141,165 @@ export default function ResumeDetailPage() {
     dot: 'bg-slate-400',
   };
 
+  const skills = analysis?.skills
+    ? (Array.isArray(analysis.skills)
+        ? analysis.skills
+        : (analysis.skills as unknown as string).split(',').map((s: string) => s.trim()).filter(Boolean))
+    : [];
+
+  const improvements = analysis?.improvements?.length
+    ? analysis.improvements
+    : analysis?.recommendations
+        ? analysis.recommendations.split(';').map(s => s.trim()).filter(Boolean)
+        : [];
+
   return (
-    <AnimatedLayout className="vibrant-bg min-h-screen relative">
-      <div className="vibrant-overlay" />
-      <div className="relative z-10">
-        <Navbar />
+    <AppLayout>
+      <main className="max-w-5xl mx-auto px-6 sm:px-10 py-10 w-full">
 
-        <main className="max-w-4xl mx-auto px-6 sm:px-8 py-12 flex flex-col items-center">
+        {/* ── Breadcrumb ── */}
+        <div className="flex items-center gap-2 text-sm mb-8">
+          <Link to="/dashboard" className="text-slate-500 hover:text-blue-400 transition-colors">Dashboard</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+          <span className="text-white font-semibold truncate max-w-xs">{resume.fileName}</span>
+        </div>
 
-          {/* Return Breadcrumb */}
-          <div className="w-full flex justify-start mb-6">
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-blue-400 transition-colors"
-            >
-              ← Return to Dashboard
-            </Link>
-          </div>
-
-          {/* Master Centered Box Container */}
-          <div className="w-full space-y-8">
-
-            {/* Resume Header Card */}
-            <div className="glass-card p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative">
-              <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-                <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shadow-inner">
-                  <FileText className="w-8 h-8" />
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
-                    {resume.fileName}
-                  </h1>
-                  <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap">
-                    <p className="text-sm text-zinc-400">
-                      Uploaded{' '}
-                      {new Date(resume.uploadedAt).toLocaleDateString('en-US', {
-                        month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
-                      })}
-                    </p>
-                    <span className={`badge border ${statusInfo.style}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
-                      {statusInfo.label}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              {analysis && (
-                <button onClick={exportPDF} className="btn-secondary flex-shrink-0 flex items-center gap-2 px-4 py-2" title="Download PDF Report">
-                  <Download className="w-4 h-4" /> Export PDF
-                </button>
-              )}
+        {/* ── Header Card ── */}
+        <div className="glass-card p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mb-8">
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
+              <FileText className="w-7 h-7 text-slate-300" />
             </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-white tracking-tight mb-1.5">{resume.fileName}</h1>
+              <div className="flex items-center gap-3 flex-wrap">
+                <p className="text-xs text-zinc-500">
+                  Uploaded {new Date(resume.uploadedAt).toLocaleDateString('en-US', {
+                    month: 'long', day: 'numeric', year: 'numeric',
+                  })}
+                </p>
+                <span className={`badge border ${statusInfo.style}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
+                  {statusInfo.label}
+                </span>
+              </div>
+            </div>
+          </div>
+          {analysis && (
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <button onClick={exportPDF} className="btn-secondary btn-sm flex items-center gap-2">
+                <Download className="w-4 h-4" /> Export PDF
+              </button>
+              <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary btn-sm flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> Cover Letter
+              </Link>
+            </div>
+          )}
+        </div>
 
-            <div className="section-divider" />
+        {/* ── Analysis Content ── */}
+        {analysis ? (
+          <div id="analysis-content" className="space-y-6">
 
-            {/* Analysis Content */}
-            {analysis ? (
-              <div id="analysis-content" className="space-y-8 pb-4">
+            {/* ── Row 1: ATS Score + Summary ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-                {/* Top Row: ATS Score & Executive Summary */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  
-                  {/* ATS Score Gauge */}
-                  <div className="glass-card p-8 flex flex-col items-center justify-center text-center lg:col-span-1">
-                    <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">ATS Compatibility</h2>
-                    <div className="relative w-32 h-32 flex items-center justify-center rounded-full bg-slate-900/50 border-[6px] border-slate-800 shadow-inner mb-4">
-                      {/* Fake SVG Circle for Score */}
-                      <svg className="absolute inset-0 w-full h-full transform -rotate-90">
-                        <circle cx="64" cy="64" r="58" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6" />
-                        <circle 
-                          cx="64" cy="64" r="58" fill="none" 
-                          stroke={analysis.atsScore && analysis.atsScore > 75 ? '#34d399' : analysis.atsScore && analysis.atsScore > 50 ? '#fbbf24' : '#f87171'} 
-                          strokeWidth="6" 
-                          strokeDasharray="364" 
-                          strokeDashoffset={364 - (364 * (analysis.atsScore || 0)) / 100}
-                          className="transition-all duration-1000 ease-out"
-                        />
-                      </svg>
-                      <span className="text-4xl font-black text-white z-10">{analysis.atsScore || '--'}</span>
-                    </div>
-                    <p className="text-xs text-slate-400">Score based on keyword density and formatting</p>
-                  </div>
+              {/* ATS Score */}
+              <div className="glass-card p-8 flex items-center justify-center lg:col-span-1">
+                <ScoreGauge score={analysis.atsScore ?? 0} />
+              </div>
 
-                  {/* Executive Summary */}
-                  <div className="glass-card p-8 flex flex-col justify-center lg:col-span-2">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
-                        <FileText className="w-5 h-5" />
-                      </span>
-                      <h2 className="text-lg font-bold text-white tracking-tight">Executive Summary</h2>
-                    </div>
-                    <p className="text-slate-300 leading-relaxed text-[15px] font-normal">
-                      {analysis.summary}
-                    </p>
-                  </div>
+              {/* What's Already There */}
+              <div className="glass-card p-8 lg:col-span-3">
+                <div className="flex items-center gap-2.5 mb-5">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                  <h2 className="text-base font-bold text-white tracking-tight">What's Already There</h2>
                 </div>
 
-                {/* Skills & Stats */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Extracted Skills */}
-                  <div className="glass-card p-7 lg:col-span-2">
-                    <div className="flex items-center gap-3 mb-5">
-                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
-                        <Lightbulb className="w-5 h-5" />
-                      </span>
-                      <h2 className="text-lg font-bold text-white tracking-tight">Technical & Soft Skills</h2>
+                {/* Summary */}
+                <p className="text-slate-300 text-[14px] leading-[1.9] mb-6 border-l-2 border-emerald-500/30 pl-4">
+                  {analysis.summary}
+                </p>
+
+                {/* Stats row */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                  {analysis.experienceYears != null && (
+                    <div className="px-4 py-2 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Experience</p>
+                      <p className="text-lg font-black text-white">{analysis.experienceYears} yrs</p>
                     </div>
-                    <div className="flex flex-wrap gap-2.5">
-                      {analysis.skills.map((skill, idx) => (
-                        <span key={idx} className="px-3.5 py-1.5 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                          {skill.trim()}
+                  )}
+                  {analysis.education && (
+                    <div className="px-4 py-2 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Education</p>
+                      <p className="text-sm font-semibold text-white leading-snug">{analysis.education}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Skills */}
+                {skills.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Detected Skills</p>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map((skill, idx) => (
+                        <span key={idx}
+                          className="px-3 py-1.5 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                          {skill}
                         </span>
                       ))}
                     </div>
                   </div>
-
-                  {/* Candidate Profile Stats */}
-                  <div className="glass-card p-7 flex flex-col gap-4 justify-center">
-                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.05]">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Experience</p>
-                      <p className="text-2xl font-black text-white">{analysis.experienceYears != null ? `${analysis.experienceYears} Years` : 'N/A'}</p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.05]">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Education</p>
-                      <p className="text-sm font-semibold text-slate-200 leading-snug">{analysis.education || 'Not specified'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* AI Insights & Improvements */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Key Insights */}
-                  <div className="glass-card p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
-                        <Search className="w-5 h-5" />
-                      </span>
-                      <h2 className="text-lg font-bold text-white tracking-tight">Key Insights</h2>
-                    </div>
-                    <ul className="space-y-4">
-                      {(analysis.insights || []).map((insight, i) => (
-                        <li key={i} className="flex gap-3 text-sm text-slate-300">
-                          <span className="text-indigo-400 mt-0.5">•</span> {insight}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Actionable Improvements */}
-                  <div className="glass-card p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <span className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
-                        <TrendingUp className="w-5 h-5" />
-                      </span>
-                      <h2 className="text-lg font-bold text-white tracking-tight">Actionable Improvements</h2>
-                    </div>
-                    <ul className="space-y-4">
-                      {(analysis.improvements || []).map((imp, i) => (
-                        <li key={i} className="flex gap-3 text-sm text-slate-300">
-                          <span className="text-rose-400 mt-0.5">→</span> {imp}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* AI Recommendations String (Legacy Fallback / Summary) */}
-                <div className="glass-card p-6 border-l-4 border-l-blue-500 bg-blue-500/5">
-                  <p className="text-sm text-slate-300 leading-relaxed italic">
-                    "{analysis.recommendations}"
-                  </p>
-                </div>
-
-                {/* Action Row */}
-                <div className="flex justify-center pt-4" data-html2canvas-ignore="true">
-                  <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" /> Generate Cover Letter
-                  </Link>
-                </div>
-
-                {/* Footer Metadata */}
-                <div className="text-center pb-4">
-                  <p className="text-[11px] text-slate-500">
-                    Processed via Groq LLaMA 3 Engine • {new Date(analysis.analyzedAt).toLocaleDateString()}
-                  </p>
-                </div>
-
+                )}
               </div>
+            </div>
 
-            ) : resume.status === 'FAILED' ? (
-              <div className="glass-card p-14 text-center flex flex-col items-center justify-center">
-                <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-5">
-                  <AlertCircle className="w-8 h-8" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3 text-center">Analysis Unsuccessful</h3>
-                <p className="text-slate-400 text-sm max-w-md mx-auto mb-6 text-center leading-relaxed">
-                  The AI model could not process this resume. Please try re-uploading with clean plain text formatting.
-                </p>
-                <div className="flex justify-center">
-                  <Link to="/upload" className="btn-primary btn-sm">
-                    Re-upload Resume
-                  </Link>
-                </div>
+            {/* ── Row 2: Improvements Needed ── */}
+            <div className="glass-card p-8">
+              <div className="flex items-center gap-2.5 mb-6">
+                <TrendingUp className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                <h2 className="text-base font-bold text-white tracking-tight">Improvements Needed</h2>
               </div>
-
-            ) : (
-              <div className="glass-card p-14 text-center flex flex-col items-center justify-center">
-                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-5 animate-pulse">
-                  <Loader2 className="w-8 h-8 animate-spin" />
+              {improvements.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {improvements.map((imp, i) => (
+                    <div key={i} className="flex gap-3 p-4 rounded-xl bg-amber-500/[0.05] border border-amber-500/15">
+                      <span className="text-amber-400 font-bold text-sm flex-shrink-0 mt-0.5">→</span>
+                      <p className="text-slate-300 text-[13.5px] leading-relaxed">{imp}</p>
+                    </div>
+                  ))}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2 text-center">Analysis in Progress</h3>
-                <p className="text-slate-400 text-sm max-w-sm mx-auto text-center">
-                  Your resume is queued for AI evaluation. Refresh the page shortly to view results.
-                </p>
-              </div>
-            )}
+              ) : (
+                <p className="text-slate-500 text-sm">No specific improvements identified. Resume looks solid!</p>
+              )}
+            </div>
 
           </div>
-        </main>
-      </div>
-    </AnimatedLayout>
+
+        ) : resume.status === 'FAILED' ? (
+          <div className="glass-card p-14 text-center flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-5">
+              <AlertCircle className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-3">Analysis Unsuccessful</h3>
+            <p className="text-slate-400 text-sm max-w-md mx-auto mb-6 leading-relaxed">
+              The AI model could not process this resume. Please try re-uploading with clean plain text formatting.
+            </p>
+            <Link to="/upload" className="btn-primary btn-sm">Re-upload Resume</Link>
+          </div>
+        ) : (
+          <div className="glass-card p-14 text-center flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-5 animate-pulse">
+              <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Analysis in Progress</h3>
+            <p className="text-slate-400 text-sm max-w-sm mx-auto">
+              Your resume is queued for AI evaluation. Refresh the page shortly to view results.
+            </p>
+          </div>
+        )}
+
+      </main>
+    </AppLayout>
   );
 }

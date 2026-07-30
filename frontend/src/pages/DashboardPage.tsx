@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import AnimatedLayout from '../components/AnimatedLayout';
+import AppLayout from '../components/AppLayout';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { FileText, CheckCircle, Hourglass, AlertTriangle, FolderOpen, AlertCircle } from 'lucide-react';
@@ -68,12 +67,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <AnimatedLayout className="vibrant-bg min-h-screen relative">
-      <div className="vibrant-overlay" />
-      <div className="relative z-10">
-        <Navbar />
-
-        <main className="max-w-[1440px] mx-auto px-8 sm:px-14 py-12">
+    <AppLayout>
+      <main className="max-w-[1440px] mx-auto px-8 sm:px-14 py-10">
 
           {/* ── Page Header ── */}
           <div className="page-header">
@@ -231,8 +226,7 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-        </main>
-      </div>
-    </AnimatedLayout>
+      </main>
+    </AppLayout>
   );
 }

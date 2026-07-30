@@ -49,7 +49,7 @@ export default function LandingPage() {
       </header>
 
       {/* ── Main Content Area ── */}
-      <main className="relative z-10 flex-1 w-full flex flex-col items-center justify-center px-6 sm:px-12 py-16">
+      <main className="relative z-10 flex-1 w-full flex flex-col items-center justify-center px-6 sm:px-12 pt-28 pb-16">
 
         {/* Hero Section — Pure Centered Layout */}
         <div className="text-center max-w-4xl w-full mx-auto flex flex-col items-center justify-center">

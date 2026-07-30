@@ -32,15 +32,10 @@ function AnimatedRoutes() {
   );
 }
 
-import Footer from './components/Footer';
-
 function App() {
   return (
     <BrowserRouter>
-      <div className="pb-24 min-h-screen">
-        <AnimatedRoutes />
-      </div>
-      <Footer />
+      <AnimatedRoutes />
     </BrowserRouter>
   );
 }

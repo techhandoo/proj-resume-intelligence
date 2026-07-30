@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as pdfjsLib from 'pdfjs-dist';
-import Navbar from '../components/Navbar';
-import AnimatedLayout from '../components/AnimatedLayout';
+import AppLayout from '../components/AppLayout';
 import { UploadCloud, FileText, File, AlertCircle, Loader2, CheckCircle, Zap } from 'lucide-react';
 import api from '../lib/api';
 
@@ -94,12 +93,8 @@ export default function UploadPage() {
   const isReady = content.trim() && fileName.trim() && !parsing;
 
   return (
-    <AnimatedLayout className="vibrant-bg min-h-screen relative">
-      <div className="vibrant-overlay" />
-      <div className="relative z-10">
-        <Navbar />
-
-        <main className="flex justify-center px-4 sm:px-6 py-14">
+    <AppLayout>
+      <main className="flex justify-center px-4 sm:px-6 py-10">
           <div className="w-full max-w-2xl">
 
             {/* Page Header */}
@@ -271,8 +266,7 @@ export default function UploadPage() {
               )}
             </form>
           </div>
-        </main>
-      </div>
-    </AnimatedLayout>
+      </main>
+    </AppLayout>
   );
 }
