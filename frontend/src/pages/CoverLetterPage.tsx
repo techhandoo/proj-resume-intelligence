@@ -82,6 +82,12 @@ export default function CoverLetterPage() {
     saveAs(blob, 'Cover_Letter.docx');
   };
 
+  const copyToClipboard = () => {
+    if (!coverLetter) return;
+    navigator.clipboard.writeText(coverLetter);
+    alert('Cover letter copied to clipboard!');
+  };
+
   return (
     <AppLayout>
       <main className="max-w-[1200px] mx-auto px-6 sm:px-10 py-10 w-full">
@@ -177,6 +183,9 @@ export default function CoverLetterPage() {
               </div>
               {coverLetter && (
                 <div className="flex items-center gap-2">
+                  <button onClick={copyToClipboard} className="btn-secondary btn-sm flex items-center gap-1.5 bg-zinc-800/50 hover:bg-zinc-800" title="Copy to Clipboard">
+                    <FileText className="w-3.5 h-3.5" /> Copy
+                  </button>
                   <button onClick={exportPDF} className="btn-secondary btn-sm flex items-center gap-1.5" title="Download PDF">
                     <Download className="w-3.5 h-3.5" /> PDF
                   </button>

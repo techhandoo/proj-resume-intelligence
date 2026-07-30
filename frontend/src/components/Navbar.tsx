@@ -1,11 +1,9 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UploadCloud, Info, PenTool, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { LogOut, Bell, Search } from 'lucide-react';
 import { getUser, clearAuth } from '../lib/auth';
-import Logo from './Logo';
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const location = useLocation();
   const user = getUser();
 
   const handleLogout = () => {
@@ -13,55 +11,54 @@ export default function Navbar() {
     navigate('/');
   };
 
-  const isActive = (path: string) => location.pathname === path;
-
-  const navLinks = [
-    { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-    { to: '/upload',    label: 'Upload',    icon: <UploadCloud className="w-4 h-4" /> },
-    { to: '/about',     label: 'About',     icon: <Info className="w-4 h-4" /> },
-    { to: '/cover-letter', label: 'Cover Letter', icon: <PenTool className="w-4 h-4" /> },
-  ];
-
   return (
-    <nav className="fixed top-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-      <div className="pointer-events-auto bg-black/80 backdrop-blur-lg border border-white/10 rounded-full px-2 py-2 flex items-center justify-between shadow-2xl shadow-black/50 w-full max-w-4xl">
-
-        {/* Brand */}
-        <Logo size="sm" href="/dashboard" />
-
-        {/* Nav Links */}
-        <div className="flex items-center gap-1">
-          {navLinks.map(({ to, label, icon }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold tracking-wide transition-all duration-200 ${
-                isActive(to)
-                  ? 'text-white bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {icon}
-              {label}
-            </Link>
-          ))}
+    <nav className="sticky top-0 z-40 w-full px-6 py-4 flex items-center justify-between pointer-events-auto">
+      {/* Search / Left Side */}
+      <div className="flex-1 flex items-center">
+        <div className="relative w-full max-w-md hidden sm:block">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          <input 
+            type="text" 
+            placeholder="Search resumes, templates..." 
+            className="w-full bg-white/[0.03] border border-white/[0.06] rounded-full py-2 pl-10 pr-4 text-sm text-slate-300 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
+          />
         </div>
+      </div>
 
-        {/* User Area */}
-        <div className="flex items-center gap-4">
+      {/* Right Side / User Profile */}
+      <div className="flex items-center gap-4">
+        
+        {/* Notification Bell */}
+        <button className="relative p-2 text-slate-400 hover:text-white transition-colors rounded-full hover:bg-white/5">
+          <Bell className="w-5 h-5" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#030712]"></span>
+        </button>
+
+        {/* Separator */}
+        <div className="h-6 w-px bg-white/[0.1]"></div>
+
+        {/* User Info */}
+        <div className="flex items-center gap-3 pl-2">
           <div className="text-right hidden sm:block">
-            <p className="text-[14px] font-bold text-white leading-snug tracking-tight">
+            <p className="text-[13px] font-bold text-white leading-none">
               {user?.fullName || 'User Account'}
             </p>
-            <p className="text-xs text-slate-500 truncate max-w-[150px] mt-0.5">
-              {user?.email || 'user@proj.ai'}
+            <p className="text-[11px] text-slate-500 mt-1">
+              {user?.email || 'user@aura.ai'}
             </p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shadow-md ring-2 ring-white/10 flex-shrink-0">
+          
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold text-sm flex-shrink-0 border border-white/10"
+            style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)' }}>
             {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
           </div>
-          <button onClick={handleLogout} className="btn-danger btn-sm hidden sm:inline-flex items-center gap-2">
-            <LogOut className="w-4 h-4" /> Logout
+
+          <button
+            onClick={handleLogout}
+            title="Logout"
+            className="ml-1 p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
+          >
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>

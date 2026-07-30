@@ -4,7 +4,8 @@ import AppLayout from '../components/AppLayout';
 import { FileText, AlertCircle, Loader2, Download, TrendingUp, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
 import api from '../lib/api';
 import html2pdf from 'html2pdf.js';
-
+import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
+import { saveAs } from 'file-saver';
 interface ResumeDetail {
   id: string;
   fileName: string;
@@ -108,6 +109,34 @@ export default function ResumeDetailPage() {
     }).from(element).save();
   };
 
+  const exportWord = async () => {
+    if (!analysis) return;
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: [
+          new Paragraph({ text: `Resume Analysis for ${resume?.fileName}`, heading: HeadingLevel.HEADING_1 }),
+          new Paragraph({ text: `ATS Score: ${analysis.atsScore ?? 0}/100`, heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({ text: "" }),
+          new Paragraph({ text: "What's Already There", heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({ text: analysis.summary }),
+          new Paragraph({ text: "" }),
+          new Paragraph({ text: "Improvements Needed", heading: HeadingLevel.HEADING_2 }),
+          ...(improvements.map(imp => new Paragraph({ text: `• ${imp}` }))),
+        ],
+      }],
+    });
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `Analysis_${resume?.fileName || 'Resume'}.docx`);
+  };
+
+  const copyToClipboard = () => {
+    if (!analysis) return;
+    const text = `Resume Analysis for ${resume?.fileName}\n\nATS Score: ${analysis.atsScore ?? 0}/100\n\nWhat's Already There:\n${analysis.summary}\n\nImprovements Needed:\n${improvements.map(i => `• ${i}`).join('\n')}`;
+    navigator.clipboard.writeText(text);
+    alert('Analysis copied to clipboard!');
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -186,9 +215,15 @@ export default function ResumeDetailPage() {
             </div>
           </div>
           {analysis && (
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-3 flex-shrink-0 flex-wrap justify-end">
+              <button onClick={copyToClipboard} className="btn-secondary btn-sm flex items-center gap-2 bg-zinc-800/50 hover:bg-zinc-800">
+                <FileText className="w-4 h-4" /> Copy
+              </button>
+              <button onClick={exportWord} className="btn-secondary btn-sm flex items-center gap-2">
+                <FileText className="w-4 h-4" /> Word
+              </button>
               <button onClick={exportPDF} className="btn-secondary btn-sm flex items-center gap-2">
-                <Download className="w-4 h-4" /> Export PDF
+                <Download className="w-4 h-4" /> PDF
               </button>
               <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary btn-sm flex items-center gap-2">
                 <Sparkles className="w-4 h-4" /> Cover Letter
