@@ -36,7 +36,7 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
         {!isCollapsed && (
           <div className="flex flex-col min-w-0 overflow-hidden">
             <span className="text-[14px] font-bold text-white tracking-tight leading-none truncate">
-              Aura AI
+              Resumify AI
             </span>
             <span className="text-[10px] text-zinc-500 font-medium truncate mt-0.5">
               Workspace

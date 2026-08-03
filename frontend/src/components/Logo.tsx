@@ -72,7 +72,7 @@ function LogoText({ size = 'sm' }: { size: 'sm' | 'md' }) {
           letterSpacing: '-0.02em',
         }}
       >
-        Aura
+        Resumify
       </span>
     </div>
   );

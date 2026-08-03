@@ -79,7 +79,7 @@ export default function RegisterPage() {
               Create your account
             </h1>
             <p className="text-zinc-400 text-[15px] leading-relaxed font-medium text-center max-w-sm mx-auto">
-              Get started with Aura AI — completely free
+              Get started with Resumify AI — completely free
             </p>
           </div>
 

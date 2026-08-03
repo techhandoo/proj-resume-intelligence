@@ -71,16 +71,16 @@ export default function DashboardPage() {
       <main className="max-w-[1440px] mx-auto px-8 sm:px-14 py-10">
 
           {/* ── Page Header ── */}
-          <div className="page-header flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left">
-            <div className="flex-1 flex flex-col items-center sm:items-start">
-              <h1 className="page-title text-center sm:text-left">
+          <div className="page-header flex flex-col items-center justify-center text-center mt-12 mb-6">
+            <div className="flex flex-col items-center">
+              <h1 className="page-title text-center">
                 Resume Intelligence
               </h1>
-              <p className="page-subtitle max-w-xl text-center sm:text-left mx-auto sm:mx-0">
+              <p className="page-subtitle max-w-xl text-center mx-auto mt-2">
                 AI-driven candidate analysis, skill extraction, and resume recommendations.
               </p>
             </div>
-            <Link to="/upload" className="btn-primary flex-shrink-0 px-8 py-3.5 shadow-lg shadow-blue-500/20 mt-6 sm:mt-0">
+            <Link to="/upload" className="btn-primary flex-shrink-0 px-10 py-4 shadow-lg shadow-blue-500/20 mt-8 text-lg font-semibold">
               + Upload Resume
             </Link>
           </div>

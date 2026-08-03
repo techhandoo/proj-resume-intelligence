@@ -65,7 +65,7 @@ export default function CoverLetterPage() {
     if (!element) return;
     html2pdf().set({
       margin: 1,
-      filename: 'Aura_Cover_Letter.pdf',
+      filename: 'Resumify_Cover_Letter.pdf',
       image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const },
@@ -103,7 +103,7 @@ export default function CoverLetterPage() {
         <div className="mb-10 text-center">
           <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">AI Cover Letter Generator</h1>
           <p className="text-slate-400 text-[14px] leading-relaxed max-w-lg mx-auto">
-            Select a resume, paste the job description, and Aura AI will write a tailored cover letter.
+            Select a resume, paste the job description, and Resumify AI will write a tailored cover letter.
           </p>
         </div>
 

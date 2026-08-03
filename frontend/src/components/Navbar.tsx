@@ -44,7 +44,7 @@ export default function Navbar() {
               {user?.fullName || 'User Account'}
             </p>
             <p className="text-[11px] text-slate-500 mt-1">
-              {user?.email || 'user@aura.ai'}
+              {user?.email || 'user@resumify.ai'}
             </p>
           </div>
           
