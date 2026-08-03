@@ -113,24 +113,24 @@ export default function AboutPage() {
         <div className="section-divider mb-10" />
 
         {/* ── How It Works ── */}
-        <section className="mb-14">
-          <h2 className="text-xl font-bold text-white mb-1">How It Works</h2>
-          <p className="text-slate-500 text-sm mb-8">A fully asynchronous pipeline from upload to AI-generated insights</p>
+        <section className="mb-14 flex flex-col items-center">
+          <h2 className="text-2xl font-bold text-white mb-2 text-center">How It Works</h2>
+          <p className="text-slate-500 text-sm mb-10 text-center">A fully asynchronous pipeline from upload to AI-generated insights</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
             {features.map((f) => {
               const c = colorMap[f.color];
               return (
                 <div
                   key={f.title}
-                  className={`glass-card p-7 flex flex-col gap-4 border ${c.border} hover:-translate-y-1 transition-transform duration-200`}
+                  className={`glass-card p-8 flex flex-col items-center text-center gap-5 border ${c.border} hover:-translate-y-1 transition-transform duration-200`}
                 >
-                  <div className={`w-11 h-11 rounded-xl ${c.iconBg} border ${c.border} flex items-center justify-center ${c.iconColor} flex-shrink-0`}>
+                  <div className={`w-12 h-12 rounded-2xl ${c.iconBg} border ${c.border} flex items-center justify-center ${c.iconColor} flex-shrink-0`}>
                     {f.icon}
                   </div>
-                  <div>
-                    <h3 className="text-[15px] font-bold text-white mb-2">{f.title}</h3>
-                    <p className="text-slate-400 text-[13px] leading-[1.8]">{f.desc}</p>
+                  <div className="flex flex-col items-center">
+                    <h3 className="text-[16px] font-bold text-white mb-2">{f.title}</h3>
+                    <p className="text-slate-400 text-[13.5px] leading-[1.8]">{f.desc}</p>
                   </div>
                 </div>
               );
@@ -141,18 +141,18 @@ export default function AboutPage() {
         <div className="section-divider mb-10" />
 
         {/* ── Architecture Flow ── */}
-        <section className="mb-14">
-          <h2 className="text-xl font-bold text-white mb-1">Architecture</h2>
-          <p className="text-slate-500 text-sm mb-8">Layered MVC with a decoupled async AI pipeline</p>
+        <section className="mb-14 flex flex-col items-center">
+          <h2 className="text-2xl font-bold text-white mb-2 text-center">Architecture</h2>
+          <p className="text-slate-500 text-sm mb-10 text-center">Layered MVC with a decoupled async AI pipeline</p>
 
-          <div className="glass-card p-8">
-            <p className="text-slate-300 text-[14px] leading-[2.0] mb-8 max-w-3xl">
+          <div className="glass-card p-10 flex flex-col items-center text-center w-full">
+            <p className="text-slate-300 text-[14px] leading-[2.0] mb-8 max-w-3xl mx-auto">
               The backend uses a <strong className="text-white">layered MVC architecture</strong> with a clear separation between
               controllers, services, and repositories. The AI pipeline is fully decoupled via{' '}
               <strong className="text-white">RabbitMQ</strong> — uploads are accepted instantly, then processed
               asynchronously so the API stays responsive at all times.
             </p>
-            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+            <div className="flex flex-wrap justify-center items-center gap-2 text-xs font-semibold">
               {['React', '→', 'Vite Proxy', '→', 'Spring Boot', '→', 'RabbitMQ', '→', 'AI Worker', '→', 'Groq LLM'].map((s, i) =>
                 s === '→'
                   ? <span key={i} className="text-slate-600 text-sm">→</span>
@@ -165,11 +165,11 @@ export default function AboutPage() {
         <div className="section-divider mb-10" />
 
         {/* ── Tech Stack ── */}
-        <section className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-1">Technology Stack</h2>
-          <p className="text-slate-500 text-sm mb-8">Modern, production-grade tools across the full stack</p>
+        <section className="mb-8 flex flex-col items-center w-full">
+          <h2 className="text-2xl font-bold text-white mb-2 text-center">Technology Stack</h2>
+          <p className="text-slate-500 text-sm mb-10 text-center">Modern, production-grade tools across the full stack</p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
             {techStack.map((section) => {
               const c = colorMap[section.color];
               return (

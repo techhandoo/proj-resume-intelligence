@@ -71,7 +71,7 @@ export default function DashboardPage() {
       <main className="max-w-[1440px] mx-auto px-8 sm:px-14 py-10">
 
           {/* ── Page Header ── */}
-          <div className="page-header flex flex-col items-center justify-center text-center mt-12 mb-6">
+          <div className="page-header flex flex-col items-center justify-center text-center mt-24 mb-10">
             <div className="flex flex-col items-center">
               <h1 className="page-title text-center">
                 Resume Intelligence
