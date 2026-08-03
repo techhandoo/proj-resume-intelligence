@@ -173,23 +173,23 @@ export default function AboutPage() {
             {techStack.map((section) => {
               const c = colorMap[section.color];
               return (
-                <div key={section.category} className={`glass-card overflow-hidden border ${c.border}`}>
-                  <div className={`px-7 py-5 border-b ${c.border} flex items-center justify-between`}>
+                <div key={section.category} className={`glass-card overflow-hidden border ${c.border} flex flex-col items-center text-center`}>
+                  <div className={`px-7 py-6 border-b ${c.border} w-full flex flex-col items-center justify-center gap-4`}>
                     <div className="flex items-center gap-3">
-                      <span className={`${c.iconColor}`}>{section.icon}</span>
-                      <h3 className={`text-[14px] font-extrabold ${c.title}`}>{section.category}</h3>
+                      <span className={`${c.iconColor} scale-125`}>{section.icon}</span>
+                      <h3 className={`text-[16px] font-extrabold ${c.title}`}>{section.category}</h3>
                     </div>
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${c.iconBg} ${c.border} ${c.title}`}>
+                    <span className={`text-[10px] font-bold px-4 py-1.5 rounded-full border ${c.iconBg} ${c.border} ${c.title} uppercase tracking-wider`}>
                       {section.items.length} tools
                     </span>
                   </div>
-                  <div className="px-7 py-6 space-y-5">
+                  <div className="px-7 py-8 space-y-8 w-full flex flex-col items-center">
                     {section.items.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3.5">
-                        <div className={`w-2 h-2 rounded-full ${c.dot} flex-shrink-0 mt-[7px] opacity-80`} />
-                        <div>
-                          <p className="text-[13px] font-bold text-white">{item.name}</p>
-                          <p className="text-[12.5px] text-slate-400 leading-relaxed mt-0.5">{item.desc}</p>
+                      <div key={i} className="flex flex-col items-center gap-2.5">
+                        <div className={`w-4 h-1 rounded-full ${c.dot} opacity-70`} />
+                        <div className="flex flex-col items-center">
+                          <p className="text-[15px] font-bold text-white">{item.name}</p>
+                          <p className="text-[13.5px] text-slate-400 leading-relaxed mt-1.5 max-w-sm">{item.desc}</p>
                         </div>
                       </div>
                     ))}
