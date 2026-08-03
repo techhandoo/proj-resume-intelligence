@@ -63,9 +63,9 @@ export default function LandingPage() {
           </div>
 
           {/* Headline — Balanced 2 lines */}
-          <h1 className="animate-fade-in-up-delay-1 text-5xl sm:text-6xl lg:text-[72px] font-black leading-[1.15] tracking-tight mb-8 text-center w-full">
-            <span className="text-white">Transform Resumes </span>
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">
+          <h1 className="animate-fade-in-up-delay-1 text-5xl sm:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-8 text-center w-full flex flex-col items-center">
+            <span className="text-white pb-2 block">Transform Resumes </span>
+            <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent block">
               Into Actionable Insights
             </span>
           </h1>
@@ -94,30 +94,30 @@ export default function LandingPage() {
         </div>
 
         {/* Feature Cards Section — Bento Grid */}
-        <div className="w-full max-w-[1000px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+        <div className="w-full max-w-[1200px] mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             
-            {/* Feature 1 (Spans 2 columns) */}
+            {/* Feature 1 */}
             <div
-              className="md:col-span-2 glass-card glass-card-hover p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center gap-8 animate-fade-in-up"
+              className="glass-card glass-card-hover p-8 flex flex-col items-start animate-fade-in-up"
               style={{ animationDelay: '0.42s' }}
             >
-              <div className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-2xl ${features[0].iconBg} border flex items-center justify-center text-3xl shadow-md`}>
+              <div className={`w-14 h-14 rounded-2xl ${features[0].iconBg} border flex items-center justify-center text-2xl mb-6 shadow-md`}>
                 {features[0].icon}
               </div>
               <div className="text-left">
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-tight">
+                <h3 className="text-lg font-bold text-white mb-3 tracking-tight">
                   {features[0].title}
                 </h3>
-                <p className="text-zinc-400 text-[15px] sm:text-base leading-relaxed">
+                <p className="text-zinc-400 text-[14px] leading-relaxed">
                   {features[0].description}
                 </p>
               </div>
             </div>
 
-            {/* Feature 2 (Spans 1 column) */}
+            {/* Feature 2 */}
             <div
-              className="md:col-span-1 glass-card glass-card-hover p-8 flex flex-col items-start animate-fade-in-up"
+              className="glass-card glass-card-hover p-8 flex flex-col items-start animate-fade-in-up"
               style={{ animationDelay: '0.56s' }}
             >
               <div className={`w-14 h-14 rounded-2xl ${features[1].iconBg} border flex items-center justify-center text-2xl mb-6 shadow-md`}>
@@ -131,9 +131,9 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 3 (Spans 1 column) */}
+            {/* Feature 3 */}
             <div
-              className="md:col-span-1 glass-card glass-card-hover p-8 flex flex-col items-start animate-fade-in-up"
+              className="glass-card glass-card-hover p-8 flex flex-col items-start animate-fade-in-up"
               style={{ animationDelay: '0.70s' }}
             >
               <div className={`w-14 h-14 rounded-2xl ${features[2].iconBg} border flex items-center justify-center text-2xl mb-6 shadow-md`}>
