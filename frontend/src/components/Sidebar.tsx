@@ -24,7 +24,7 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
   return (
     <aside 
-      className={`fixed top-4 bottom-4 left-4 flex flex-col z-50 transition-all duration-300 ease-in-out bg-white/[0.02] backdrop-blur-2xl border border-white/[0.08] rounded-2xl ${
+      className={`fixed top-4 bottom-4 left-10 flex flex-col z-50 transition-all duration-300 ease-in-out bg-white/[0.02] backdrop-blur-2xl border border-white/[0.08] rounded-2xl ${
         isCollapsed ? 'w-16' : 'w-60'
       }`}
     >
