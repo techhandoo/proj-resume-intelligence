@@ -21,12 +21,23 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#030712] to-[#030712] flex selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[#05050a] flex selection:bg-blue-500/30 overflow-hidden relative">
+      {/* ── Midnight Mesh Background Orbs ── */}
+      <div className="absolute top-0 left-1/4 w-[50vw] h-[50vw] bg-indigo-900/20 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
+      <div className="absolute bottom-0 right-1/4 w-[40vw] h-[40vw] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none translate-y-1/3" />
+
       <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
-      <div className={`flex-1 flex flex-col min-h-screen overflow-x-hidden transition-all duration-300 ease-in-out ${isCollapsed ? 'ml-16' : 'ml-60'}`}>
-        {/* We place the Navbar here so it sits at the top of the main content area */}
+      
+      {/* ── Bounded Main Container ── */}
+      <div 
+        className="flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out relative z-10"
+        style={{
+          marginLeft: isCollapsed ? '4rem' : '15rem',
+          width: `calc(100vw - ${isCollapsed ? '4rem' : '15rem'})`
+        }}
+      >
         <Navbar />
-        <AnimatedLayout className="flex-1 flex flex-col pt-2">
+        <AnimatedLayout className="flex-1 flex flex-col pt-2 w-full max-w-full overflow-x-hidden">
           {children}
         </AnimatedLayout>
       </div>
