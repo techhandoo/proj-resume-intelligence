@@ -128,7 +128,10 @@ export default function AboutPage() {
                 return (
                   <div
                     key={f.title}
-                    className={`glass-card p-8 flex flex-col items-center text-center gap-5 border ${c.border} hover:-translate-y-1.5 transition-transform duration-300`}
+                    className={`glass-card p-8 flex flex-col items-center text-center gap-5 border ${c.border} transition-colors duration-300 hover:bg-white/[0.02]`}
+                    style={{ transition: 'transform 200ms var(--ease-out), background-color 300ms ease' }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-6px)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                   >
                     <div className={`w-14 h-14 rounded-2xl ${c.iconBg} border ${c.border} flex items-center justify-center ${c.iconColor}`}>
                       {f.icon}

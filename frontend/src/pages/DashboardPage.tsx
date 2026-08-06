@@ -53,17 +53,30 @@ export default function DashboardPage() {
     { label: 'Failed',            value: stats.failed,     gradient: 'from-rose-400 to-pink-500',     icon: <AlertTriangle className="w-5 h-5 text-rose-400" />, iconBg: 'bg-rose-500/10 border-rose-500/20',     accent: 'hover:border-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]'    },
   ];
 
-  const containerVariants: Variants = {
+  const containerVariants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
   };
 
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 15 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15, scale: 0.95 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 250,
+        damping: 25,
+        mass: 0.5
+      }
+    },
   };
 
   return (
@@ -83,7 +96,7 @@ export default function DashboardPage() {
             <p className="text-slate-400 text-[15px] sm:text-base max-w-xl leading-relaxed mb-10">
               AI-driven candidate analysis, skill extraction, and automated resume recommendations in one seamless pipeline.
             </p>
-            <Link to="/upload" className="btn-primary group flex items-center gap-3 px-8 py-4 shadow-[0_0_20px_rgba(59,130,246,0.25)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all">
+            <Link to="/upload" className="btn-primary group flex items-center gap-3 px-8 py-4 shadow-[0_0_20px_rgba(59,130,246,0.25)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] active:scale-95 transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out">
               <UploadCloud className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
               Upload New Resume
             </Link>
@@ -97,7 +110,7 @@ export default function DashboardPage() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mb-16"
           >
             {statCards.map((stat) => (
-              <motion.div variants={itemVariants} key={stat.label} className={`glass-card p-6 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-1.5 ${stat.accent}`}>
+              <motion.div variants={itemVariants} key={stat.label} whileHover={{ y: -6, transition: { duration: 0.2, ease: "easeOut" } }} className={`glass-card p-6 flex flex-col items-center text-center transition-colors duration-300 hover:bg-white/[0.02] ${stat.accent}`}>
                 <div className={`w-14 h-14 rounded-2xl ${stat.iconBg} border flex items-center justify-center mb-5 shadow-lg`}>
                   {stat.icon}
                 </div>
