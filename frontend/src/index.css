@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap');
 @import "tailwindcss";
 
 /* ── Design Tokens ─────────────────────────────────────── */
@@ -9,7 +8,7 @@
   --color-primary-700: #1d4ed8;
   --color-surface: #0b1329;
   --color-surface-light: #152238;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
 }
 
 :root {
@@ -33,7 +32,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   background-color: #000000;
   color: #ededed;
   min-height: 100vh;

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
-import { motion } from 'framer-motion';
-import type { Variants } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { FileText, CheckCircle, Hourglass, AlertTriangle, FolderOpen, AlertCircle, UploadCloud } from 'lucide-react';
 import api from '../lib/api';
 
@@ -53,7 +52,7 @@ export default function DashboardPage() {
     { label: 'Failed',            value: stats.failed,     gradient: 'from-rose-400 to-pink-500',     icon: <AlertTriangle className="w-5 h-5 text-rose-400" />, iconBg: 'bg-rose-500/10 border-rose-500/20',     accent: 'hover:border-rose-500/30 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]'    },
   ];
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -64,7 +63,7 @@ export default function DashboardPage() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 15, scale: 0.95 },
     show: { 
       opacity: 1, 
@@ -72,9 +71,8 @@ export default function DashboardPage() {
       scale: 1,
       transition: {
         type: 'spring',
-        stiffness: 250,
-        damping: 25,
-        mass: 0.5
+        bounce: 0.2,
+        duration: 0.4
       }
     },
   };
