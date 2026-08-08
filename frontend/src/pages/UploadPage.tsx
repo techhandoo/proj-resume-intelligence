@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import * as pdfjsLib from 'pdfjs-dist';
 import AppLayout from '../components/AppLayout';
 import { UploadCloud, FileText, File, AlertCircle, Loader2, CheckCircle, Zap } from 'lucide-react';
 import api from '../lib/api';
 
-// Configure PDF.js worker (use CDN for simplicity in Vite)
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 async function extractTextFromPDF(file: File): Promise<string> {
@@ -23,27 +25,29 @@ async function extractTextFromPDF(file: File): Promise<string> {
   return fullText.trim();
 }
 
+const uploadSchema = z.object({
+  fileName: z.string().min(2, 'Resume title is required (min 2 characters)'),
+  content: z.string().min(10, 'Resume content must be at least 10 characters for AI analysis'),
+});
+
+type UploadFormValues = z.infer<typeof uploadSchema>;
+
 export default function UploadPage() {
   const navigate = useNavigate();
-  const [fileName, setFileName] = useState('');
-  const [content,  setContent ] = useState('');
-  const [error,    setError   ] = useState('');
-  const [loading,  setLoading ] = useState(false);
-  const [parsing,  setParsing ] = useState(false);
+  const [error, setError] = useState('');
+  const [parsing, setParsing] = useState(false);
   const [fileType, setFileType] = useState<'txt' | 'pdf' | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const res = await api.post('/resumes', { fileName, content });
-      navigate(`/resumes/${res.data.id}`);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Upload failed. Please verify resume text and try again.');
-      setLoading(false);
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<UploadFormValues>({
+    resolver: zodResolver(uploadSchema),
+    defaultValues: {
+      fileName: '',
+      content: '',
     }
-  };
+  });
+
+  const contentValue = watch('content');
+  const isReady = contentValue.trim().length >= 10 && !parsing;
 
   const processFile = async (file: File) => {
     setError('');
@@ -55,7 +59,7 @@ export default function UploadPage() {
       return;
     }
 
-    setFileName(file.name.replace(/\.[^/.]+$/, ''));
+    setValue('fileName', file.name.replace(/\.[^/.]+$/, ''), { shouldValidate: true });
     setFileType(isPDF ? 'pdf' : 'txt');
 
     if (isPDF) {
@@ -63,9 +67,9 @@ export default function UploadPage() {
       try {
         const text = await extractTextFromPDF(file);
         if (!text) {
-          setError('Could not extract text from this PDF. It may be scanned or image-only. Please try a text-based PDF or paste the content manually.');
+          setError('Could not extract text from this PDF. It may be scanned or image-only.');
         } else {
-          setContent(text);
+          setValue('content', text, { shouldValidate: true });
         }
       } catch {
         setError('PDF parsing failed. Please paste the resume text manually below.');
@@ -74,7 +78,9 @@ export default function UploadPage() {
       }
     } else {
       const reader = new FileReader();
-      reader.onload = (ev) => setContent(ev.target?.result as string);
+      reader.onload = (ev) => {
+        setValue('content', ev.target?.result as string, { shouldValidate: true });
+      };
       reader.readAsText(file);
     }
   };
@@ -90,183 +96,147 @@ export default function UploadPage() {
     if (file) processFile(file);
   };
 
-  const isReady = content.trim() && fileName.trim() && !parsing;
+  const onSubmit = async (data: UploadFormValues) => {
+    setError('');
+    try {
+      const res = await api.post('/resumes', data);
+      navigate(`/resumes/${res.data.id}`);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Upload failed. Please verify and try again.');
+    }
+  };
 
   return (
     <AppLayout>
-      <main className="flex justify-center px-4 sm:px-6 py-10">
-          <div className="w-full max-w-2xl">
+      <div className="w-full max-w-3xl mx-auto">
+        <div className="mb-8">
+          <h1 className="page-title">Upload Resume</h1>
+          <p className="page-subtitle">
+            Upload a PDF, TXT file, or paste content directly to run an AI analysis.
+          </p>
+        </div>
 
-            {/* Page Header */}
-            <div className="text-center mb-12 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white mb-6 shadow-md">
-                <UploadCloud className="w-8 h-8" />
-              </div>
-              <h1 className="text-4xl font-extrabold text-white tracking-tight mb-4">
-                Upload Resume
-              </h1>
-              <p className="text-zinc-400 text-[15px] leading-relaxed max-w-lg mx-auto">
-                Drop a <span className="text-white font-semibold">.pdf</span> or{' '}
-                <span className="text-white font-semibold">.txt</span> file, or paste the
-                resume text below to launch automated AI analysis.
-              </p>
+        {error && (
+          <div className="mb-6 p-3 rounded-md bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+            <p className="text-rose-500 text-[13px] font-medium leading-snug">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="glass-card p-6">
+            <label htmlFor="fileName" className="form-label">Resume Title</label>
+            <input
+              id="fileName"
+              type="text"
+              {...register('fileName')}
+              disabled={isSubmitting}
+              className={`form-input ${errors.fileName ? 'border-rose-500 focus:border-rose-500' : ''}`}
+              placeholder="e.g. John Doe - Full Stack Developer"
+            />
+            {errors.fileName ? (
+              <p className="mt-1.5 text-[12px] text-rose-500">{errors.fileName.message}</p>
+            ) : (
+              <p className="mt-1.5 text-[12px] text-zinc-500">This will be used to identify your resume in the dashboard.</p>
+            )}
+          </div>
+
+          <div className="glass-card p-6">
+            <label className="form-label mb-4">Resume Content</label>
+            
+            {/* Drop Zone */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              className="mb-6 border border-dashed border-[#262626] hover:border-zinc-500 rounded-lg py-8 px-6 text-center bg-[#050505] transition-colors cursor-pointer"
+            >
+              {parsing ? (
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="w-6 h-6 text-zinc-400 animate-spin" />
+                  <p className="text-[13px] font-medium text-zinc-300">Extracting text from PDF...</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <UploadCloud className="w-8 h-8 text-zinc-500 mb-3" />
+                  <p className="text-[13px] font-medium text-zinc-200 mb-1">
+                    Click or drag file to this area to upload
+                  </p>
+                  <p className="text-[12px] text-zinc-500 mb-4">Supports .pdf and .txt files</p>
+                  <label className="btn-secondary btn-sm cursor-pointer">
+                    Browse Files
+                    <input
+                      type="file"
+                      accept=".pdf,.txt,.text"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              )}
             </div>
 
-            <div className="section-divider mb-10" />
-
-            {/* Error */}
-            {error && (
-              <div className="mb-7 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0.5 text-rose-400">
-                  <AlertCircle className="w-5 h-5" />
-                </div>
-                <p className="text-rose-400 text-sm font-medium leading-relaxed">{error}</p>
+            {/* File type indicator */}
+            {fileType && contentValue && !parsing && (
+              <div className="mb-4 inline-flex items-center gap-2 px-2.5 py-1 rounded-md text-[11px] font-medium border bg-[#171717] border-[#262626] text-zinc-300">
+                {fileType === 'pdf' ? (
+                  <><File className="w-3.5 h-3.5" /> PDF Parsed</>
+                ) : (
+                  <><FileText className="w-3.5 h-3.5" /> TXT Loaded</>
+                )}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 h-px bg-[#1f1f22]" />
+              <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">or paste manually</span>
+              <div className="flex-1 h-px bg-[#1f1f22]" />
+            </div>
 
-              {/* Resume Title */}
-              <div className="glass-card px-8 py-7">
-                <label htmlFor="fileName" className="form-label">
-                  Resume Title / Candidate Name
-                  <span className="text-zinc-500 ml-1 normal-case tracking-normal font-normal text-xs">(required)</span>
-                </label>
-                <input
-                  id="fileName"
-                  type="text"
-                  value={fileName}
-                  onChange={(e) => setFileName(e.target.value)}
-                  required
-                  className="form-input"
-                  placeholder="e.g. Sarah_Jenkins_FullStack_Resume"
-                />
-                <p className="mt-2.5 text-xs text-zinc-500 leading-relaxed">
-                  This identifier appears in your dashboard resume list
-                </p>
-              </div>
+            <textarea
+              id="content"
+              {...register('content')}
+              disabled={isSubmitting}
+              rows={12}
+              className={`form-input resize-y font-mono text-[12px] leading-relaxed ${errors.content ? 'border-rose-500 focus:border-rose-500' : ''}`}
+              placeholder="Paste raw resume text here..."
+            />
+            {errors.content && (
+              <p className="mt-1.5 text-[12px] text-rose-500">{errors.content.message}</p>
+            )}
 
-              {/* Drop Zone & Text Area */}
-              <div className="glass-card px-8 py-7">
-                <label htmlFor="content" className="form-label">
-                  Resume Content
-                  <span className="text-blue-400 ml-1 normal-case tracking-normal font-normal text-xs">(required)</span>
-                </label>
-
-                {/* Drop Zone */}
-                <div
-                  onDrop={handleDrop}
-                  onDragOver={(e) => e.preventDefault()}
-                  className="mb-6 border border-dashed border-white/20 hover:border-white/40 rounded-2xl py-10 px-6 text-center bg-black/40 hover:bg-white/5 transition-all cursor-pointer group"
-                >
-                  {parsing ? (
-                    <div className="flex flex-col items-center gap-4">
-                      <Loader2 className="w-10 h-10 text-white animate-spin" />
-                      <p className="text-sm font-semibold text-zinc-300">Extracting text from PDF...</p>
-                      <p className="text-xs text-zinc-500">This may take a moment for large files</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white mx-auto mb-5 group-hover:scale-110 transition-transform duration-300">
-                        <UploadCloud className="w-7 h-7" />
-                      </div>
-                      <p className="text-base font-semibold text-white mb-2">
-                        Drag &amp; drop your resume here
-                      </p>
-                      <p className="text-sm text-zinc-400 mb-1 leading-relaxed">
-                        Supports <span className="text-white font-medium">.pdf</span> and{' '}
-                        <span className="text-white font-medium">.txt</span> files
-                      </p>
-                      <p className="text-xs text-zinc-600 mb-6">PDF text is extracted automatically in the browser</p>
-                      <label className="btn-secondary btn-sm cursor-pointer">
-                        Browse Files
-                        <input
-                          type="file"
-                          accept=".pdf,.txt,.text"
-                          onChange={handleFileSelect}
-                          className="hidden"
-                        />
-                      </label>
-                    </>
-                  )}
-                </div>
-
-                {/* File type indicator */}
-                {fileType && content && !parsing && (
-                  <div className={`mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border ${
-                    fileType === 'pdf'
-                      ? 'bg-red-500/10 border-red-500/20 text-red-400'
-                      : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
-                  }`}>
-                    {fileType === 'pdf' ? (
-                      <><File className="w-4 h-4" /> PDF parsed</>
-                    ) : (
-                      <><FileText className="w-4 h-4" /> TXT loaded</>
-                    )} — {content.length.toLocaleString()} characters extracted
-                  </div>
-                )}
-
-                {/* Divider */}
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="flex-1 h-px bg-white/[0.05]" />
-                  <span className="text-xs text-slate-500 font-medium uppercase tracking-widest">or paste text below</span>
-                  <div className="flex-1 h-px bg-white/[0.05]" />
-                </div>
-
-                {/* Textarea */}
-                <textarea
-                  id="content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  required
-                  rows={14}
-                  className="form-input resize-y leading-[1.75]"
-                  style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace", fontSize: '13px' }}
-                  placeholder={`Paste full resume text here...\n\nExample:\nJohn Smith\nSenior Full-Stack Engineer | 6 Years Experience\n\nSkills: Java, React, TypeScript, PostgreSQL, Docker, AWS\nEducation: B.S. Computer Science, Stanford University (2020)\n\nExperience:\n  Lead Developer, CloudScale Inc (2022–Present)\n  Architected microservices handling 2M+ daily requests`}
-                />
-
-                {/* Counter */}
-                <div className="flex items-center justify-between mt-3.5">
-                  <span className="text-xs text-zinc-500">
-                    {content.length > 0
-                      ? `${content.length.toLocaleString()} characters`
-                      : 'Supports plain text and PDF-extracted content'}
-                  </span>
-                  {content.length > 0 && (
-                    <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4" />
-                      Ready for submission
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading || !isReady}
-                className="btn-primary w-full py-4 text-base tracking-wide"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Analyzing Resume...
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <Zap className="w-5 h-5" /> Submit for AI Analysis
-                  </span>
-                )}
-              </button>
-
-              {!isReady && !parsing && (
-                <p className="text-center text-xs text-zinc-600 font-medium -mt-2">
-                  Fill in both the title and resume content to enable submission
-                </p>
+            <div className="flex items-center justify-between mt-3">
+              <span className="text-[11px] text-zinc-500">
+                {contentValue.length} characters
+              </span>
+              {isReady && (
+                <span className="text-[11px] text-emerald-500 font-medium flex items-center gap-1.5">
+                  <CheckCircle className="w-3.5 h-3.5" /> Ready
+                </span>
               )}
-            </form>
+            </div>
           </div>
-      </main>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={isSubmitting || !isReady}
+              className="btn-primary min-w-[160px]"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 mr-2" />
+                  Run AI Analysis
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </AppLayout>
   );
 }

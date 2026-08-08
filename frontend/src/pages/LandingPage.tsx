@@ -1,180 +1,120 @@
 import { Link } from 'react-router-dom';
-import Logo from '../components/Logo';
 import AnimatedLayout from '../components/AnimatedLayout';
-import { FileText, Brain, Zap } from 'lucide-react';
+import { Command, FileText, Brain, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { motion, type Variants } from 'framer-motion';
 
 const features = [
   {
-    icon: <FileText className="w-8 h-8 text-blue-400" />,
+    icon: FileText,
     title: 'Smart Resume Ingestion',
     description: 'Instant text parsing with drop-and-upload capabilities built for modern recruiter workflows.',
-    iconBg: 'bg-blue-500/10 border-blue-500/20',
   },
   {
-    icon: <Brain className="w-8 h-8 text-indigo-400" />,
+    icon: Brain,
     title: 'Deep AI Analytics',
     description: 'Powered by advanced Groq LLM engines to extract structured candidate skills, metrics, and education.',
-    iconBg: 'bg-indigo-500/10 border-indigo-500/20',
   },
   {
-    icon: <Zap className="w-8 h-8 text-teal-400" />,
+    icon: Zap,
     title: 'Instant Recommendations',
     description: 'Receive automated candidate improvement suggestions and structured career insights in seconds.',
-    iconBg: 'bg-teal-500/10 border-teal-500/20',
   },
 ];
 
-// Emil Kowalski Stagger Animation Variants
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
-    },
-  },
+  show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 15, scale: 0.95 },
-  show: { 
-    opacity: 1, 
-    y: 0, 
-    scale: 1,
-    transition: {
-      type: 'spring',
-      bounce: 0,
-      duration: 0.4
-    }
-  },
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0, duration: 0.5 } },
 };
 
 export default function LandingPage() {
   return (
-    <AnimatedLayout className="vibrant-bg min-h-screen relative overflow-x-hidden flex flex-col justify-between">
-      <div className="vibrant-overlay" />
-      <div className="hero-glow" />
-      <div className="hero-glow-secondary" />
-
-      {/* ── Floating Navbar ── */}
-      <motion.header 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="fixed top-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none"
-      >
-        <div className="pointer-events-auto bg-black/60 backdrop-blur-xl border border-white/10 rounded-full px-2 py-2 flex items-center justify-between shadow-[0_10px_40px_rgba(0,0,0,0.8)] w-full max-w-4xl transition-all duration-300">
-          <div className="ml-2">
-            <Logo size="sm" href="/" />
+    <AnimatedLayout className="min-h-screen bg-[#000000] relative flex flex-col selection:bg-zinc-800 selection:text-zinc-100">
+      
+      {/* Navbar */}
+      <header className="absolute top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-4 border-b border-[#1f1f22] bg-[#000000]/80 backdrop-blur-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded bg-white flex items-center justify-center">
+            <Command className="w-4 h-4 text-black" />
           </div>
-          <div className="flex items-center gap-2">
-            <Link to="/login" className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-zinc-400 hover:text-white transition-colors duration-200 active:scale-95">
-              Sign In
-            </Link>
-            <Link to="/register" className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold bg-white text-black hover:bg-zinc-200 transition-colors duration-200 active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)]">
-              Get Started
-            </Link>
-          </div>
+          <span className="font-semibold text-zinc-100 tracking-tight text-sm">Resumify Inc.</span>
         </div>
-      </motion.header>
+        <div className="flex items-center gap-4">
+          <Link to="/login" className="text-[13px] font-medium text-zinc-400 hover:text-zinc-100 transition-colors">
+            Sign In
+          </Link>
+          <Link to="/register" className="btn-primary py-1.5 px-3 text-[13px]">
+            Get Started
+          </Link>
+        </div>
+      </header>
 
-      {/* ── Main Content Area ── */}
-      <main className="relative z-10 flex-1 w-full flex flex-col items-center justify-center px-6 sm:px-12 pt-32 pb-16">
-
-        {/* Hero Section */}
+      {/* Hero Section */}
+      <main className="flex-1 flex flex-col items-center justify-center pt-32 pb-20 px-6">
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="text-center max-w-4xl w-full mx-auto flex flex-col items-center justify-center"
+          className="max-w-4xl w-full mx-auto flex flex-col items-center text-center"
         >
-
-          {/* Badge Pill */}
-          <motion.div variants={itemVariants} className="flex justify-center mb-8">
-            <span className="inline-flex items-center gap-2.5 px-6 py-2.5 text-xs font-bold tracking-widest uppercase text-blue-400 bg-blue-500/10 border border-blue-500/25 rounded-full shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-              Automated Resume Intelligence Platform
-            </span>
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 mb-8 border border-[#1f1f22] rounded-full bg-[#050505]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="text-[11px] font-medium text-zinc-300 tracking-wide uppercase">Resumify AI 2.0 is live</span>
           </motion.div>
 
-          {/* Headline */}
-          <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-8 text-center w-full flex flex-col items-center">
-            <span className="text-white pb-2 block">Transform Resumes </span>
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent block">
-              Into Actionable Insights
-            </span>
+          <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl md:text-7xl font-semibold text-zinc-100 tracking-tight leading-[1.1] mb-6">
+            Transform resumes into<br/>
+            <span className="text-zinc-500">actionable insights.</span>
           </motion.h1>
 
-          {/* Description Text */}
-          <motion.p variants={itemVariants} className="text-[17px] sm:text-lg text-slate-400 max-w-2xl mx-auto leading-[1.8] text-center font-medium mb-12 px-4">
-            Analyze, categorize, and evaluate candidate resumes at scale.
-            Extract key technical skills, experience estimates, and AI recommendations seamlessly.
+          <motion.p variants={itemVariants} className="text-[16px] md:text-[18px] text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10">
+            Analyze, categorize, and evaluate candidate resumes at scale. 
+            Extract key technical skills and AI recommendations instantly.
           </motion.p>
 
-          {/* Action Buttons */}
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24 w-full">
-            <Link
-              to="/register"
-              className="btn-primary w-full sm:w-auto px-10 py-4 text-[15px] shadow-[0_0_30px_rgba(59,130,246,0.15)]"
-            >
-              Start Free Analysis →
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <Link to="/register" className="btn-primary w-full sm:w-auto px-8 py-3 text-[14px]">
+              Start Building <ArrowRight className="w-4 h-4 ml-1.5" />
             </Link>
-            <Link
-              to="/login"
-              className="btn-secondary w-full sm:w-auto px-10 py-4 text-[15px]"
-            >
-              Sign In to Account
+            <Link to="/about" className="btn-secondary w-full sm:w-auto px-8 py-3 text-[14px]">
+              Read the Docs
             </Link>
           </motion.div>
         </motion.div>
 
-        {/* Feature Cards Section — Bento Grid */}
+        {/* Feature Grid */}
         <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="w-full max-w-[1200px] mx-auto px-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full mx-auto mt-32"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            
-            {features.map((feature, idx) => (
-              <motion.div
-                key={idx}
-                variants={itemVariants}
-                whileHover={{ y: -4, transition: { duration: 0.2, ease: "easeOut" } }}
-                className="glass-card p-8 flex flex-col items-start transition-colors duration-300 hover:bg-white/[0.02]"
-              >
-                <div className={`w-14 h-14 rounded-2xl ${feature.iconBg} border flex items-center justify-center text-2xl mb-6 shadow-lg`}>
-                  {feature.icon}
+          {features.map((feature, idx) => {
+            const Icon = feature.icon;
+            return (
+              <div key={idx} className="glass-card p-6 flex flex-col group">
+                <div className="w-10 h-10 rounded-lg bg-[#171717] border border-[#1f1f22] flex items-center justify-center mb-5 group-hover:border-zinc-500 transition-colors">
+                  <Icon className="w-5 h-5 text-zinc-300" />
                 </div>
-                <div className="text-left">
-                  <h3 className="text-lg font-bold text-white mb-3 tracking-tight">
-                    {feature.title}
-                  </h3>
-                  <p className="text-zinc-400 text-[14px] leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-
-          </div>
+                <h3 className="text-[15px] font-semibold text-zinc-100 mb-2">{feature.title}</h3>
+                <p className="text-[13px] text-zinc-400 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            );
+          })}
         </motion.div>
-
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="relative z-10 border-t border-white/[0.05] py-7">
-        <div className="max-w-[1440px] mx-auto px-8 sm:px-14 flex items-center justify-between flex-wrap gap-4">
-          <span className="text-sm text-slate-500 font-medium">
-            © {new Date().getFullYear()} PROJ Intelligence Systems. All rights reserved.
-          </span>
-          <span className="flex items-center gap-2 text-xs font-bold text-slate-400 bg-black/40 px-3.5 py-1.5 rounded-full border border-white/[0.05]">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]" />
-            All systems operational
-          </span>
+      {/* Footer */}
+      <footer className="border-t border-[#1f1f22] py-6 px-6 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between">
+        <span className="text-[12px] text-zinc-500">© {new Date().getFullYear()} Resumify Inc.</span>
+        <div className="flex items-center gap-1.5 text-[12px] text-zinc-500 mt-4 sm:mt-0">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> All systems operational
         </div>
       </footer>
     </AnimatedLayout>

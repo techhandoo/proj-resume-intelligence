@@ -21,24 +21,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <div className="min-h-screen bg-[#05050a] flex selection:bg-blue-500/30 overflow-hidden relative">
-      {/* ── Midnight Mesh Background Orbs ── */}
-      <div className="absolute top-0 left-1/4 w-[50vw] h-[50vw] bg-indigo-900/20 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-0 right-1/4 w-[40vw] h-[40vw] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none translate-y-1/3" />
-
+    <div className="min-h-screen bg-black flex selection:bg-zinc-800 overflow-hidden">
       <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
       
-      {/* ── Bounded Main Container ── */}
       <div 
-        className="flex-1 flex flex-col min-h-screen relative z-10"
+        className="flex-1 flex flex-col min-h-screen relative"
         style={{
-          marginLeft: isCollapsed ? '4rem' : '15rem',
-          width: `calc(100vw - ${isCollapsed ? '4rem' : '15rem'})`,
-          transition: 'margin-left 300ms var(--ease-drawer), width 300ms var(--ease-drawer)'
+          marginLeft: isCollapsed ? '4rem' : '14rem',
+          width: `calc(100vw - ${isCollapsed ? '4rem' : '14rem'})`,
+          transition: 'margin-left 200ms ease, width 200ms ease'
         }}
       >
         <Navbar />
-        <AnimatedLayout className="flex-1 flex flex-col pt-2 w-full max-w-full overflow-x-hidden">
+        <AnimatedLayout className="flex-1 flex flex-col w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </AnimatedLayout>
       </div>

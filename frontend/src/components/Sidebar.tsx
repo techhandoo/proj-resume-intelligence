@@ -2,18 +2,17 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileUp,
-  Edit3,
+  Settings,
   BookOpen,
-  Cpu,
+  Command,
   PanelLeftClose,
   PanelLeftOpen
 } from 'lucide-react';
 
 const navItems = [
-  { to: '/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/upload',      icon: FileUp,          label: 'Upload Resume' },
-  { to: '/cover-letter',icon: Edit3,           label: 'Cover Letter' },
-  { to: '/about',       icon: BookOpen,        label: 'About' },
+  { to: '/dashboard',   icon: LayoutDashboard, label: 'Overview' },
+  { to: '/upload',      icon: FileUp,          label: 'Upload' },
+  { to: '/about',       icon: BookOpen,        label: 'Documentation' },
 ];
 
 interface SidebarProps {
@@ -26,36 +25,33 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
   
   return (
     <aside 
-      className={`fixed top-0 bottom-0 left-0 flex flex-col z-50 bg-white/[0.02] backdrop-blur-2xl border-r border-white/[0.08] ${
-        isCollapsed ? 'w-16' : 'w-60'
+      className={`fixed top-0 bottom-0 left-0 flex flex-col z-50 bg-[#0a0a0a] border-r border-[#1f1f22] ${
+        isCollapsed ? 'w-16' : 'w-56'
       }`}
       style={{
-        transition: 'width 300ms var(--ease-drawer)'
+        transition: 'width 200ms ease'
       }}
     >
       {/* ── Logo Area ── */}
-      <div className={`flex items-center h-16 flex-shrink-0 ${isCollapsed ? 'justify-center' : 'px-5 gap-3'}`}>
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-900/20">
-          <Cpu className="w-4 h-4 text-white" />
+      <div className={`flex items-center h-14 flex-shrink-0 border-b border-[#1f1f22] ${isCollapsed ? 'justify-center' : 'px-4 gap-3'}`}>
+        <div className="w-7 h-7 rounded-md bg-white flex items-center justify-center flex-shrink-0">
+          <Command className="w-4 h-4 text-black" />
         </div>
         {!isCollapsed && (
           <div className="flex flex-col min-w-0 overflow-hidden">
-            <span className="text-[14px] font-bold text-white tracking-tight leading-none truncate">
-              Resumify AI
-            </span>
-            <span className="text-[10px] text-zinc-500 font-medium truncate mt-0.5">
-              Workspace
+            <span className="text-[13px] font-semibold text-zinc-100 tracking-tight truncate">
+              Resumify Inc.
             </span>
           </div>
         )}
       </div>
 
       {/* ── Navigation Links ── */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3 flex flex-col gap-1.5">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 flex flex-col gap-0.5">
         {!isCollapsed && (
-          <div className="px-1 mb-2">
-            <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">
-              Main Menu
+          <div className="px-2 mb-2">
+            <p className="text-[11px] font-medium text-zinc-500">
+              Workspace
             </p>
           </div>
         )}
@@ -68,16 +64,16 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
               to={to}
               title={isCollapsed ? label : undefined}
               className={`
-                group relative flex items-center ${isCollapsed ? 'justify-center p-2.5 mx-0.5' : 'gap-3.5 px-3 py-2.5'} rounded-xl transition-[background-color,color,transform] duration-200 ease-out active:scale-[0.96]
+                group relative flex items-center ${isCollapsed ? 'justify-center p-2 mx-1' : 'gap-3 px-2 py-1.5'} rounded-md transition-colors duration-150
                 ${isActive 
-                  ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_12px_rgba(59,130,246,0.1)]' 
-                  : 'text-zinc-400 hover:text-white hover:bg-white/[0.04] border border-transparent'}
+                  ? 'bg-[#171717] text-zinc-100' 
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#171717]'}
               `}
             >
-              <Icon className={`w-[20px] h-[20px] flex-shrink-0 transition-colors ${isActive ? 'text-blue-400' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
+              <Icon className={`w-[16px] h-[16px] flex-shrink-0 transition-colors ${isActive ? 'text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
               
               {!isCollapsed && (
-                <span className="text-[13.5px] font-semibold truncate">
+                <span className="text-[13px] font-medium truncate">
                   {label}
                 </span>
               )}
@@ -86,21 +82,28 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
         })}
       </nav>
 
-      {/* ── Bottom Toggle Area ── */}
-      <div className="p-3 border-t border-white/[0.05]">
+      {/* ── Bottom Settings & Toggle Area ── */}
+      <div className="p-2 border-t border-[#1f1f22] flex flex-col gap-0.5">
+        <NavLink
+          to="/settings"
+          title={isCollapsed ? "Settings" : undefined}
+          className={`flex items-center ${isCollapsed ? 'justify-center p-2 mx-1' : 'gap-3 px-2 py-1.5'} rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-[#171717] transition-colors`}
+        >
+          <Settings className="w-[16px] h-[16px]" />
+          {!isCollapsed && <span className="text-[13px] font-medium">Settings</span>}
+        </NavLink>
+
         <button
           onClick={toggleCollapse}
-          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          className={`flex items-center w-full rounded-xl transition-[background-color,color,transform] duration-200 ease-out active:scale-[0.96] text-zinc-400 hover:text-white hover:bg-white/[0.04] border border-transparent ${
-            isCollapsed ? 'justify-center p-2.5' : 'gap-3.5 px-3 py-2.5'
-          }`}
+          title={isCollapsed ? "Expand" : "Collapse"}
+          className={`flex items-center w-full ${isCollapsed ? 'justify-center p-2 mx-1' : 'gap-3 px-2 py-1.5'} rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-[#171717] transition-colors`}
         >
           {isCollapsed ? (
-            <PanelLeftOpen className="w-[20px] h-[20px]" />
+            <PanelLeftOpen className="w-[16px] h-[16px]" />
           ) : (
             <>
-              <PanelLeftClose className="w-[20px] h-[20px]" />
-              <span className="text-[13.5px] font-semibold truncate">Collapse</span>
+              <PanelLeftClose className="w-[16px] h-[16px]" />
+              <span className="text-[13px] font-medium">Collapse</span>
             </>
           )}
         </button>

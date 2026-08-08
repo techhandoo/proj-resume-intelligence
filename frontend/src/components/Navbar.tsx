@@ -1,9 +1,10 @@
-import { useNavigate } from 'react-router-dom';
-import { LogOut, Bell, Search } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { LogOut, Bell, Search, Command } from 'lucide-react';
 import { getUser, clearAuth } from '../lib/auth';
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = getUser();
 
   const handleLogout = () => {
@@ -11,57 +12,54 @@ export default function Navbar() {
     navigate('/');
   };
 
+  // Simple breadcrumb logic based on pathname
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  const currentView = pathParts.length > 0 ? pathParts[pathParts.length - 1].replace('-', ' ') : 'Dashboard';
+
   return (
-    <nav className="sticky top-4 z-40 mx-4 px-6 py-4 flex items-center justify-between pointer-events-auto bg-white/[0.02] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-xl shadow-black/20">
-      {/* Search / Left Side */}
-      <div className="flex-1 flex items-center">
-        <div className="relative w-full max-w-md hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <input 
-            type="text" 
-            placeholder="Search resumes, templates..." 
-            className="w-full bg-white/[0.03] border border-white/[0.06] rounded-full py-2 pl-10 pr-4 text-sm text-slate-300 placeholder:text-zinc-600 focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
-          />
-        </div>
+    <header className="sticky top-0 z-40 w-full h-14 flex items-center justify-between px-4 sm:px-6 bg-[#000000]/80 backdrop-blur-md border-b border-[#1f1f22]">
+      {/* Left side: Breadcrumbs */}
+      <div className="flex items-center gap-2">
+        <span className="text-[13px] text-zinc-500 font-medium">Resumify Inc.</span>
+        <span className="text-zinc-700">/</span>
+        <span className="text-[13px] text-zinc-200 font-medium capitalize">{currentView}</span>
       </div>
 
-      {/* Right Side / User Profile */}
+      {/* Center/Right Side */}
       <div className="flex items-center gap-4">
-        
-        {/* Notification Bell */}
-        <button className="relative p-2 text-slate-400 hover:text-white transition-colors rounded-full hover:bg-white/5">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#030712]"></span>
+        {/* Search */}
+        <div className="relative hidden md:flex items-center">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-[14px] h-[14px] text-zinc-500" />
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            className="w-48 bg-[#0a0a0a] border border-[#1f1f22] rounded-md py-1.5 pl-8 pr-3 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-zinc-600">
+            <Command className="w-3 h-3" />
+            <span className="text-[10px] font-medium leading-none">K</span>
+          </div>
+        </div>
+
+        <button className="relative text-zinc-400 hover:text-zinc-100 transition-colors">
+          <Bell className="w-4 h-4" />
         </button>
 
-        {/* Separator */}
-        <div className="h-6 w-px bg-white/[0.1]"></div>
+        <div className="h-4 w-px bg-[#1f1f22]"></div>
 
-        {/* User Info */}
-        <div className="flex items-center gap-3 pl-2">
-          <div className="text-right hidden sm:block">
-            <p className="text-[13px] font-bold text-white leading-none">
-              {user?.fullName || 'User Account'}
-            </p>
-            <p className="text-[11px] text-slate-500 mt-1">
-              {user?.email || 'user@resumify.ai'}
-            </p>
-          </div>
-          
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold text-sm flex-shrink-0 border border-white/10"
-            style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)' }}>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-[#171717] border border-[#1f1f22] flex items-center justify-center text-zinc-200 font-medium text-xs">
             {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
           </div>
-
           <button
             onClick={handleLogout}
             title="Logout"
-            className="ml-1 p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
+            className="text-zinc-400 hover:text-zinc-100 transition-colors ml-2"
           >
             <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>
-    </nav>
+    </header>
   );
 }
