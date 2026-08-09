@@ -6,12 +6,16 @@ import {
   BookOpen,
   Command,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  PenTool,
+  FileText
 } from 'lucide-react';
 
 const navItems = [
   { to: '/dashboard',   icon: LayoutDashboard, label: 'Overview' },
   { to: '/upload',      icon: FileUp,          label: 'Upload' },
+  { to: '/cover-letter',icon: PenTool,         label: 'Cover Letter' },
+  { to: '/templates',   icon: FileText,        label: 'Templates' },
   { to: '/about',       icon: BookOpen,        label: 'Documentation' },
 ];
 
@@ -47,7 +51,7 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
       </div>
 
       {/* ── Navigation Links ── */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 flex flex-col gap-0.5">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 flex flex-col gap-1.5">
         {!isCollapsed && (
           <div className="px-2 mb-2">
             <p className="text-[11px] font-medium text-zinc-500">

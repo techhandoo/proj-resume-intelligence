@@ -55,11 +55,34 @@ export default function AboutPage() {
               </div>
               <h2 className="text-[16px] font-semibold text-zinc-100">AI Processing Pipeline</h2>
             </div>
-            <p className="text-[14px] text-zinc-400 leading-relaxed mb-4">
+            <p className="text-[14px] text-zinc-400 leading-relaxed mb-6">
               Our analysis engine leverages the Groq platform to process text at blistering speeds.
               When a document is uploaded, it passes through three stages:
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <div className="mb-8 p-4 bg-black/40 rounded-lg border border-white/[0.05]">
+              <h3 className="text-sm font-semibold text-zinc-300 mb-4 text-center">Data Flow Architecture</h3>
+              <div className="flex flex-col items-center gap-2 font-mono text-[11px] text-zinc-400">
+                <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded text-blue-400">User Uploads PDF/TXT</div>
+                <div className="w-px h-4 bg-zinc-700"></div>
+                <div className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded">React Frontend (Vite)</div>
+                <div className="w-px h-4 bg-zinc-700"></div>
+                <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-400">Spring Boot API</div>
+                <div className="w-px h-4 bg-zinc-700"></div>
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                     <div className="w-px h-4 bg-zinc-700"></div>
+                     <div className="px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded text-orange-400">PostgreSQL DB</div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                     <div className="w-px h-4 bg-zinc-700"></div>
+                     <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded text-purple-400">Groq LLM Engine</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-4 rounded-md border border-[#1f1f22] bg-[#050505]">
                 <h4 className="text-[13px] font-medium text-zinc-200 mb-1">1. Extraction</h4>
                 <p className="text-[12px] text-zinc-500">PDFs and TXT files are normalized into raw tokens.</p>

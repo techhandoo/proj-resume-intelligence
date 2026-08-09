@@ -9,6 +9,8 @@ import UploadPage       from './pages/UploadPage';
 import ResumeDetailPage from './pages/ResumeDetailPage';
 import CoverLetterPage  from './pages/CoverLetterPage';
 import AboutPage        from './pages/AboutPage';
+import TemplatesPage    from './pages/TemplatesPage';
+import SettingsPage     from './pages/SettingsPage';
 import ProtectedRoute   from './components/ProtectedRoute';
 
 function AnimatedRoutes() {
@@ -27,6 +29,8 @@ function AnimatedRoutes() {
         <Route path="/about"        element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
         <Route path="/resumes/:id"  element={<ProtectedRoute><ResumeDetailPage /></ProtectedRoute>} />
         <Route path="/cover-letter" element={<ProtectedRoute><CoverLetterPage /></ProtectedRoute>} />
+        <Route path="/templates"    element={<ProtectedRoute><TemplatesPage /></ProtectedRoute>} />
+        <Route path="/settings"     element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
       </Routes>
     </AnimatePresence>
   );

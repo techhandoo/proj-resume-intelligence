@@ -27,19 +27,6 @@ export default function Navbar() {
 
       {/* Center/Right Side */}
       <div className="flex items-center gap-4">
-        {/* Search */}
-        <div className="relative hidden md:flex items-center">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-[14px] h-[14px] text-zinc-500" />
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="w-48 bg-[#0a0a0a] border border-[#1f1f22] rounded-md py-1.5 pl-8 pr-3 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-zinc-600">
-            <Command className="w-3 h-3" />
-            <span className="text-[10px] font-medium leading-none">K</span>
-          </div>
-        </div>
 
         <button className="relative text-zinc-400 hover:text-zinc-100 transition-colors">
           <Bell className="w-4 h-4" />

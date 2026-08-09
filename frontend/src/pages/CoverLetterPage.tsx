@@ -110,10 +110,10 @@ export default function CoverLetterPage() {
         <div className="section-divider mb-8" />
 
         {/* ── Split Layout ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
           {/* ── Left: Input ── */}
-          <div className="glass-card p-7 flex flex-col h-[640px]">
+          <div className="glass-card p-8 flex flex-col min-h-[600px]">
             <div className="flex items-center gap-3 mb-6">
               <span className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
                 <Target className="w-4 h-4 text-slate-300" />
@@ -173,7 +173,7 @@ export default function CoverLetterPage() {
           </div>
 
           {/* ── Right: Output ── */}
-          <div className="glass-card p-7 flex flex-col h-[640px]">
+          <div className="glass-card p-8 flex flex-col min-h-[600px]">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
