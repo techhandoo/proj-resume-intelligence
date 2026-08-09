@@ -36,8 +36,11 @@ export default function LoginPage() {
         setError('Network Error: Cannot reach the backend. If on Vercel, check VITE_API_BASE_URL and CORS.');
       } else if (err.response?.status === 404) {
         setError('404 Not Found: The API endpoint does not exist on this domain.');
+      } else if (err.response?.status >= 500) {
+        setError(`Server Error (${err.response.status}): The backend might be waking up or crashing.`);
       } else {
-        setError(err.response?.data?.message || 'Invalid email or password.');
+        const status = err.response?.status ? ` (${err.response.status})` : '';
+        setError(err.response?.data?.message || `Login failed${status}. Please try again.`);
       }
     }
   };
