@@ -123,8 +123,8 @@ export default function UploadPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="glass-card p-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+          <div className="glass-card p-8">
             <label htmlFor="fileName" className="form-label">Resume Title</label>
             <input
               id="fileName"
@@ -141,8 +141,8 @@ export default function UploadPage() {
             )}
           </div>
 
-          <div className="glass-card p-6">
-            <label className="form-label mb-4">Resume Content</label>
+          <div className="glass-card p-8">
+            <label className="form-label mb-6">Resume Content</label>
             
             {/* Drop Zone */}
             <div

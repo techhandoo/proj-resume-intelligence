@@ -12,8 +12,8 @@ const dummyTemplates = Array.from({ length: 20 }, (_, i) => ({
     'Entry Level Clean', 'Senior Leader', 'Data Analyst', 'Product Manager', 'UX Researcher'
   ][i],
   category: ['Professional', 'Creative', 'Modern', 'Simple', 'Academic'][i % 5],
-  pdfUrl: `data:application/pdf;base64,JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKPDwvTGVuZ3RoIDMgMCBSL0ZpbHRlci9GbGF0ZURlY29kZT4+CnN0cmVhbQp4nDPQM1Qo5ypUMFAwALJMLU31jBQsTAz1DMyBQsYm5kDWL3g=`,
-  docxUrl: `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,UEsDBBQABgAIAAAAIQAAAA==`,
+  pdfUrl: `/templates/resume-template.pdf`,
+  docxUrl: `/templates/resume-template.docx`,
 }));
 
 export default function TemplatesPage() {

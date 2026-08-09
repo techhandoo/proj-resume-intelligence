@@ -19,7 +19,7 @@ export default function AboutPage() {
         </div>
 
         {/* Content */}
-        <div className="space-y-8">
+        <div className="space-y-16">
           
           <section className="glass-card p-6">
             <div className="flex items-center gap-3 mb-4">

@@ -51,7 +51,7 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
       </div>
 
       {/* ── Navigation Links ── */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 flex flex-col gap-1.5">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 flex flex-col gap-3">
         {!isCollapsed && (
           <div className="px-2 mb-2">
             <p className="text-[11px] font-medium text-zinc-500">

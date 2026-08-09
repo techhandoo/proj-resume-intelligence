@@ -71,7 +71,7 @@ export default function LandingPage() {
             <span className="text-zinc-500">actionable insights.</span>
           </motion.h1>
 
-          <motion.p variants={itemVariants} className="text-[16px] md:text-[18px] text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10">
+          <motion.p variants={itemVariants} className="text-[16px] md:text-[18px] text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-16">
             Analyze, categorize, and evaluate candidate resumes at scale. 
             Extract key technical skills and AI recommendations instantly.
           </motion.p>
@@ -91,7 +91,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full mx-auto mt-32"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full mx-auto mt-40"
         >
           {features.map((feature, idx) => {
             const Icon = feature.icon;
