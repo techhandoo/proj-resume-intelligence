@@ -23,7 +23,7 @@ export function LogoMark({ size = 'sm' }: { size?: 'sm' | 'md' | 'lg' }) {
       />
       
       {/* Outer shell */}
-      <div className="relative w-full h-full rounded-xl bg-[#09090b] border border-white/15 flex items-center justify-center overflow-hidden shadow-inner">
+      <div className="relative w-full h-full rounded-xl bg-raised border border-border-strong flex items-center justify-center overflow-hidden shadow-inner">
         <svg
           width={dim * 0.55}
           height={dim * 0.55}
@@ -65,10 +65,10 @@ export function LogoText({ size = 'sm' }: { size?: 'sm' | 'md' | 'lg' }) {
   const textSize = size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl';
   return (
     <div className="flex items-center gap-1.5 leading-none select-none">
-      <span className={`font-bold tracking-tight text-white ${textSize}`}>
+      <span className={`font-bold tracking-tight text-text-primary ${textSize}`}>
         Resumify
       </span>
-      <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+      <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-accent-soft border border-accent/25 text-[var(--color-accent-strong)]">
         AI
       </span>
     </div>

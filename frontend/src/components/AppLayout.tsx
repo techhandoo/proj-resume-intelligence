@@ -21,7 +21,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <div className="min-h-screen bg-[#030304] bg-mesh-pattern flex selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
+    <div className="min-h-screen bg-background bg-mesh-pattern flex selection:bg-accent/25 selection:text-white overflow-x-hidden">
       <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
       
       <div 

@@ -102,16 +102,16 @@ export default function CoverLetterPage() {
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs">
-          <Link to="/dashboard" className="text-zinc-500 hover:text-zinc-300 transition-colors">Overview</Link>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-          <span className="text-white font-semibold">AI Cover Letter Generator</span>
+          <Link to="/dashboard" className="text-text-muted hover:text-text-primary transition-colors">Overview</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-text-subtle" />
+          <span className="text-text-primary font-semibold">AI Cover Letter Generator</span>
         </div>
 
         {/* Page Title */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">AI Cover Letter Generator</h1>
-            <p className="text-xs text-zinc-400 mt-1">
+            <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">AI Cover Letter Generator</h1>
+            <p className="text-xs text-text-muted mt-1">
               Synthesize your candidate resume skills against target job postings using Groq LLM inference.
             </p>
           </div>
@@ -122,13 +122,13 @@ export default function CoverLetterPage() {
 
           {/* Left Column: Input Configuration */}
           <div className="glass-card p-6 flex flex-col min-h-[620px]">
-            <div className="flex items-center gap-2.5 pb-4 border-b border-[#1c1c21] mb-6">
-              <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+            <div className="flex items-center gap-2.5 pb-4 border-b border-border mb-6">
+              <div className="w-8 h-8 rounded-xl bg-accent-soft border border-accent/25 flex items-center justify-center text-[var(--color-accent-strong)]">
                 <Target className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider">Target Job Configuration</h2>
-                <p className="text-[11px] text-zinc-500">Provide job requirements and select writing tone.</p>
+                <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Target Job Configuration</h2>
+                <p className="text-[11px] text-text-muted">Provide job requirements and select writing tone.</p>
               </div>
             </div>
 
@@ -139,7 +139,7 @@ export default function CoverLetterPage() {
                 value={selectedResumeId}
                 onChange={(e) => setSelectedResumeId(e.target.value)}
                 disabled={loading || resumes.length === 0}
-                className="form-input bg-[#07070a] text-xs font-semibold cursor-pointer"
+                className="form-input bg-raised text-xs font-semibold cursor-pointer"
               >
                 {resumes.length === 0 && <option value="">No resumes found — upload one first</option>}
                 {resumes.map(r => (
@@ -153,7 +153,7 @@ export default function CoverLetterPage() {
             {/* Tone Selector */}
             <div className="mb-5">
               <label className="form-label flex items-center gap-1.5">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400" /> Writing Tone Style
+                <SlidersHorizontal className="w-3.5 h-3.5 text-text-muted" /> Writing Tone Style
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {TONES.map(tone => (
@@ -161,10 +161,10 @@ export default function CoverLetterPage() {
                     key={tone.id}
                     type="button"
                     onClick={() => setSelectedTone(tone.id)}
-                    className={`px-3 py-2 rounded-xl text-xs font-semibold border text-left transition-all cursor-pointer ${
+                    className={`px-3 py-2 rounded-[var(--radius-inner)] text-xs font-semibold border text-left transition-all cursor-pointer ${
                       selectedTone === tone.id
-                        ? 'bg-blue-500/15 border-blue-500/40 text-blue-300'
-                        : 'bg-[#07070a] border-[#1c1c21] text-zinc-400 hover:text-zinc-200'
+                        ? 'bg-accent-soft border-accent/40 text-[var(--color-accent-strong)]'
+                        : 'bg-raised border-border text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]'
                     }`}
                   >
                     {tone.label}
@@ -180,13 +180,13 @@ export default function CoverLetterPage() {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 placeholder="Paste the full job description or key position responsibilities here..."
-                className="form-input flex-1 resize-none font-mono text-xs leading-relaxed bg-[#050508]"
+                className="form-input flex-1 resize-none font-mono text-xs leading-relaxed bg-raised"
                 disabled={loading}
               />
             </div>
 
             {error && (
-              <p className="text-rose-400 text-xs font-semibold mb-4 rounded-xl bg-rose-500/10 border border-rose-500/20 px-4 py-3">
+              <p className="text-[var(--color-danger)] text-xs font-semibold mb-4 rounded-xl bg-[var(--color-danger-soft)] border border-[color:var(--color-danger)]/20 px-4 py-3">
                 {error}
               </p>
             )}
@@ -194,15 +194,15 @@ export default function CoverLetterPage() {
             <button
               onClick={generateCoverLetter}
               disabled={loading || !selectedResumeId}
-              className="btn-primary w-full py-3.5 text-xs font-bold shadow-xl shadow-blue-500/20 cursor-pointer disabled:opacity-50"
+              className="btn-primary w-full py-3.5 text-xs font-bold shadow-xl shadow-accent/20 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-blue-400" /> Writing Custom Cover Letter...
+                  <Loader2 className="w-4 h-4 animate-spin text-[var(--color-accent-strong)]" /> Writing Custom Cover Letter...
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
-                  <Sparkles className="w-4 h-4 text-blue-400" /> Generate Tailored Cover Letter
+                  <Sparkles className="w-4 h-4 text-[var(--color-accent-strong)]" /> Generate Tailored Cover Letter
                 </span>
               )}
             </button>
@@ -210,21 +210,21 @@ export default function CoverLetterPage() {
 
           {/* Right Column: Output Paper Preview */}
           <div className="glass-card p-6 flex flex-col min-h-[620px]">
-            <div className="flex items-center justify-between pb-4 border-b border-[#1c1c21] mb-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border mb-6">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="w-8 h-8 rounded-xl bg-[var(--color-success-soft)] border border-[color:var(--color-success)]/25 flex items-center justify-center text-[var(--color-success)]">
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-white uppercase tracking-wider">Document Preview</h2>
-                  <p className="text-[11px] text-zinc-500">Formatted cover letter output.</p>
+                  <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Document Preview</h2>
+                  <p className="text-[11px] text-text-muted">Formatted cover letter output.</p>
                 </div>
               </div>
 
               {coverLetter && (
                 <div className="flex items-center gap-2">
                   <button onClick={copyToClipboard} className="btn-secondary btn-sm py-1 px-2.5 text-xs font-semibold cursor-pointer">
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                    {copied ? <Check className="w-3.5 h-3.5 text-[var(--color-success)] mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
                     {copied ? 'Copied' : 'Copy'}
                   </button>
                   <button onClick={exportWord} className="btn-secondary btn-sm py-1 px-2.5 text-xs font-semibold cursor-pointer">
@@ -238,18 +238,18 @@ export default function CoverLetterPage() {
             </div>
 
             {/* Document Sheet Box */}
-            <div className="flex-1 bg-[#050507] border border-white/5 rounded-2xl p-6 sm:p-8 overflow-y-auto max-h-[500px] shadow-inner">
+            <div className="flex-1 bg-raised border border-border rounded-2xl p-6 sm:p-8 overflow-y-auto max-h-[500px] shadow-inner">
               {coverLetter ? (
                 <div
                   id="cover-letter-content"
-                  className="prose prose-invert max-w-none text-zinc-200 text-xs leading-[2] whitespace-pre-wrap font-sans tracking-wide"
+                  className="letter-body whitespace-pre-wrap"
                 >
                   {coverLetter}
                 </div>
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-center py-24 opacity-40">
-                  <PenTool className="w-10 h-10 mb-4 text-zinc-600" />
-                  <p className="text-zinc-400 font-semibold text-xs">
+                  <PenTool className="w-10 h-10 mb-4 text-text-subtle" />
+                  <p className="text-text-muted font-semibold text-xs">
                     {loading ? 'Groq AI is crafting your cover letter...' : 'Select a candidate resume & click Generate to write a letter.'}
                   </p>
                 </div>
