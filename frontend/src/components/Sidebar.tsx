@@ -1,22 +1,25 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   FileUp,
   Settings,
   BookOpen,
-  Command,
   PanelLeftClose,
   PanelLeftOpen,
   PenTool,
-  FileText
+  FileText,
+  UserCheck
 } from 'lucide-react';
+import Logo from './Logo';
+import { getUser } from '../lib/auth';
 
 const navItems = [
-  { to: '/dashboard',   icon: LayoutDashboard, label: 'Overview' },
-  { to: '/upload',      icon: FileUp,          label: 'Upload' },
-  { to: '/cover-letter',icon: PenTool,         label: 'Cover Letter' },
-  { to: '/templates',   icon: FileText,        label: 'Templates' },
-  { to: '/about',       icon: BookOpen,        label: 'Documentation' },
+  { to: '/dashboard',   icon: LayoutDashboard, label: 'Overview',      shortcut: '⌘1' },
+  { to: '/upload',      icon: FileUp,          label: 'Upload',        shortcut: '⌘2' },
+  { to: '/cover-letter',icon: PenTool,         label: 'Cover Letter',  shortcut: '⌘3' },
+  { to: '/templates',   icon: FileText,        label: 'Templates',     shortcut: '⌘4' },
+  { to: '/about',       icon: BookOpen,        label: 'Documentation', shortcut: '⌘5' },
 ];
 
 interface SidebarProps {
@@ -26,41 +29,30 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
   const location = useLocation();
+  const user = getUser();
   
   return (
     <aside 
-      className={`fixed top-0 bottom-0 left-0 flex flex-col z-50 bg-[#0a0a0a] border-r border-[#1f1f22] ${
-        isCollapsed ? 'w-16' : 'w-56'
-      }`}
-      style={{
-        transition: 'width 200ms ease'
-      }}
+      className={`fixed top-0 bottom-0 left-0 flex flex-col z-50 bg-[#070709]/95 backdrop-blur-xl border-r border-[#1c1c21] ${
+        isCollapsed ? 'w-16' : 'w-60'
+      } transition-all duration-300 ease-out select-none`}
     >
       {/* ── Logo Area ── */}
-      <div className={`flex items-center h-14 flex-shrink-0 border-b border-[#1f1f22] ${isCollapsed ? 'justify-center' : 'px-4 gap-3'}`}>
-        <div className="w-7 h-7 rounded-md bg-white flex items-center justify-center flex-shrink-0">
-          <Command className="w-4 h-4 text-black" />
-        </div>
-        {!isCollapsed && (
-          <div className="flex flex-col min-w-0 overflow-hidden">
-            <span className="text-[13px] font-semibold text-zinc-100 tracking-tight truncate">
-              Resumify Inc.
-            </span>
-          </div>
-        )}
+      <div className={`flex items-center h-16 flex-shrink-0 border-b border-[#1c1c21] ${isCollapsed ? 'justify-center px-2' : 'px-5 justify-between'}`}>
+        <Logo size="sm" href="/dashboard" showText={!isCollapsed} />
       </div>
 
       {/* ── Navigation Links ── */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 flex flex-col gap-3">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-5 px-3 flex flex-col gap-1.5">
         {!isCollapsed && (
-          <div className="px-2 mb-2">
-            <p className="text-[11px] font-medium text-zinc-500">
-              Workspace
-            </p>
+          <div className="px-2 mb-2 flex items-center justify-between">
+            <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+              Navigation
+            </span>
           </div>
         )}
         
-        {navItems.map(({ to, icon: Icon, label }) => {
+        {navItems.map(({ to, icon: Icon, label, shortcut }) => {
           const isActive = location.pathname.startsWith(to);
           return (
             <NavLink
@@ -68,17 +60,32 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
               to={to}
               title={isCollapsed ? label : undefined}
               className={`
-                group relative flex items-center ${isCollapsed ? 'justify-center p-2 mx-1' : 'gap-3 px-2 py-1.5'} rounded-md transition-colors duration-150
+                group relative flex items-center ${isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2'} rounded-xl transition-all duration-200
                 ${isActive 
-                  ? 'bg-[#171717] text-zinc-100' 
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#171717]'}
+                  ? 'text-white font-semibold' 
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#121215]'}
               `}
             >
-              <Icon className={`w-[16px] h-[16px] flex-shrink-0 transition-colors ${isActive ? 'text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
-              
+              {isActive && (
+                <motion.div
+                  layoutId="sidebarActivePill"
+                  className="absolute inset-0 bg-[#17171e] border border-white/10 rounded-xl shadow-inner"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+
+              <div className="relative z-10 flex items-center gap-3 truncate">
+                <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${isActive ? 'text-blue-400' : 'text-zinc-400 group-hover:text-zinc-200'}`} />
+                {!isCollapsed && (
+                  <span className="text-[13.5px] truncate">
+                    {label}
+                  </span>
+                )}
+              </div>
+
               {!isCollapsed && (
-                <span className="text-[13px] font-medium truncate">
-                  {label}
+                <span className="relative z-10 text-[10px] font-mono text-zinc-600 group-hover:text-zinc-500 transition-colors">
+                  {shortcut}
                 </span>
               )}
             </NavLink>
@@ -86,28 +93,42 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
         })}
       </nav>
 
-      {/* ── Bottom Settings & Toggle Area ── */}
-      <div className="p-2 border-t border-[#1f1f22] flex flex-col gap-0.5">
+      {/* ── User & Toggle Area ── */}
+      <div className="p-3 border-t border-[#1c1c21] flex flex-col gap-1 bg-[#050507]">
+        {!isCollapsed && user && (
+          <div className="p-2.5 rounded-xl bg-[#0e0e12] border border-white/5 flex items-center gap-3 mb-1">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-emerald-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+              {user.fullName?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-xs font-semibold text-zinc-100 truncate">{user.fullName || 'Enterprise User'}</span>
+              <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                <UserCheck className="w-2.5 h-2.5" /> Workspace Active
+              </span>
+            </div>
+          </div>
+        )}
+
         <NavLink
           to="/settings"
           title={isCollapsed ? "Settings" : undefined}
-          className={`flex items-center ${isCollapsed ? 'justify-center p-2 mx-1' : 'gap-3 px-2 py-1.5'} rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-[#171717] transition-colors`}
+          className={`flex items-center ${isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'} rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-[#121215] transition-colors`}
         >
-          <Settings className="w-[16px] h-[16px]" />
-          {!isCollapsed && <span className="text-[13px] font-medium">Settings</span>}
+          <Settings className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="text-[13.5px] font-medium">Settings</span>}
         </NavLink>
 
         <button
           onClick={toggleCollapse}
-          title={isCollapsed ? "Expand" : "Collapse"}
-          className={`flex items-center w-full ${isCollapsed ? 'justify-center p-2 mx-1' : 'gap-3 px-2 py-1.5'} rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-[#171717] transition-colors`}
+          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          className={`flex items-center w-full ${isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2'} rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-[#121215] transition-colors cursor-pointer`}
         >
           {isCollapsed ? (
-            <PanelLeftOpen className="w-[16px] h-[16px]" />
+            <PanelLeftOpen className="w-4 h-4 text-zinc-400 hover:text-white" />
           ) : (
             <>
-              <PanelLeftClose className="w-[16px] h-[16px]" />
-              <span className="text-[13px] font-medium">Collapse</span>
+              <PanelLeftClose className="w-4 h-4 text-zinc-400" />
+              <span className="text-[13.5px] font-medium">Collapse</span>
             </>
           )}
         </button>
@@ -115,3 +136,4 @@ export default function Sidebar({ isCollapsed, toggleCollapse }: SidebarProps) {
     </aside>
   );
 }
+

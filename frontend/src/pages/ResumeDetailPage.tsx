@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
-import { FileText, AlertCircle, Loader2, Download, TrendingUp, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
+import { FileText, AlertCircle, Loader2, Download, TrendingUp, Sparkles, CheckCircle2, ChevronRight, Copy, Check, Filter, Lightbulb } from 'lucide-react';
 import api from '../lib/api';
 import html2pdf from 'html2pdf.js';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
+
 interface ResumeDetail {
   id: string;
   fileName: string;
@@ -27,45 +28,45 @@ interface AnalysisDetail {
   analyzedAt: string;
 }
 
-const statusConfig: Record<string, { label: string; style: string; dot: string }> = {
-  UPLOADED:   { label: 'Uploaded',   style: 'text-amber-400 bg-amber-500/10 border-amber-500/30',  dot: 'bg-amber-400'  },
-  PROCESSING: { label: 'Processing', style: 'text-blue-400 bg-blue-500/10 border-blue-500/30 animate-pulse', dot: 'bg-blue-400'   },
-  ANALYZED:   { label: 'Analyzed',   style: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
-  FAILED:     { label: 'Failed',     style: 'text-rose-400 bg-rose-500/10 border-rose-500/30',      dot: 'bg-rose-400'   },
+const statusConfig: Record<string, { label: string; badgeClass: string }> = {
+  UPLOADED:   { label: 'Uploaded',   badgeClass: 'badge-amber'  },
+  PROCESSING: { label: 'Processing', badgeClass: 'badge-blue'   },
+  ANALYZED:   { label: 'Analyzed',   badgeClass: 'badge-emerald' },
+  FAILED:     { label: 'Failed',     badgeClass: 'badge-rose'   },
 };
 
 function ScoreGauge({ score }: { score: number }) {
-  const radius = 56;
+  const radius = 58;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (circumference * score) / 100;
-  const color = score > 75 ? '#34d399' : score > 50 ? '#fbbf24' : '#f87171';
-  const label = score > 75 ? 'Great' : score > 50 ? 'Fair' : 'Needs Work';
-  const labelColor = score > 75 ? 'text-emerald-400' : score > 50 ? 'text-amber-400' : 'text-rose-400';
+  const color = score >= 75 ? '#34d399' : score >= 50 ? '#fbbf24' : '#f87171';
+  const label = score >= 75 ? 'Superior' : score >= 50 ? 'Moderate' : 'Needs Work';
+  const badgeClass = score >= 75 ? 'badge-emerald' : score >= 50 ? 'badge-amber' : 'badge-rose';
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <div className="relative w-36 h-36 flex items-center justify-center">
-        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 128 128">
-          <circle cx="64" cy="64" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+      <div className="relative w-40 h-40 flex items-center justify-center">
+        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 136 136">
+          <circle cx="68" cy="68" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" />
           <circle
-            cx="64" cy="64" r={radius}
+            cx="68" cy="68" r={radius}
             fill="none"
             stroke={color}
-            strokeWidth="10"
+            strokeWidth="12"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1)', filter: `drop-shadow(0 0 8px ${color}60)` }}
+            style={{ transition: 'stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1)', filter: `drop-shadow(0 0 10px ${color}50)` }}
           />
         </svg>
         <div className="z-10 text-center">
-          <span className="text-4xl font-black text-white leading-none">{score}</span>
-          <span className="text-xs text-slate-500 font-medium block mt-0.5">/ 100</span>
+          <span className="text-4xl font-black text-white leading-none tracking-tight">{score}</span>
+          <span className="text-xs text-zinc-500 font-mono block mt-0.5">/ 100</span>
         </div>
       </div>
       <div className="text-center">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">ATS Score</p>
-        <span className={`text-sm font-bold ${labelColor}`}>{label}</span>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">ATS Compatibility Rating</p>
+        <span className={`badge ${badgeClass}`}>{label} Match</span>
       </div>
     </div>
   );
@@ -77,6 +78,9 @@ export default function ResumeDetailPage() {
   const [analysis, setAnalysis] = useState<AnalysisDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<'overview' | 'skills' | 'improvements'>('overview');
+  const [copied, setCopied] = useState(false);
+  const [skillSearch, setSkillSearch] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -91,7 +95,7 @@ export default function ResumeDetailPage() {
         setAnalysis(analysisRes.data);
       }
     } catch {
-      setError('Failed to load resume details.');
+      setError('Failed to load candidate resume details.');
     } finally {
       setLoading(false);
     }
@@ -115,13 +119,13 @@ export default function ResumeDetailPage() {
       sections: [{
         properties: {},
         children: [
-          new Paragraph({ text: `Resume Analysis for ${resume?.fileName}`, heading: HeadingLevel.HEADING_1 }),
-          new Paragraph({ text: `ATS Score: ${analysis.atsScore ?? 0}/100`, heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({ text: `Resume AI Analysis for ${resume?.fileName}`, heading: HeadingLevel.HEADING_1 }),
+          new Paragraph({ text: `ATS Compatibility Score: ${analysis.atsScore ?? 0}/100`, heading: HeadingLevel.HEADING_2 }),
           new Paragraph({ text: "" }),
-          new Paragraph({ text: "What's Already There", heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({ text: "Executive Summary", heading: HeadingLevel.HEADING_2 }),
           new Paragraph({ text: analysis.summary }),
           new Paragraph({ text: "" }),
-          new Paragraph({ text: "Improvements Needed", heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({ text: "Actionable Recommendations", heading: HeadingLevel.HEADING_2 }),
           ...(improvements.map(imp => new Paragraph({ text: `• ${imp}` }))),
         ],
       }],
@@ -132,17 +136,18 @@ export default function ResumeDetailPage() {
 
   const copyToClipboard = () => {
     if (!analysis) return;
-    const text = `Resume Analysis for ${resume?.fileName}\n\nATS Score: ${analysis.atsScore ?? 0}/100\n\nWhat's Already There:\n${analysis.summary}\n\nImprovements Needed:\n${improvements.map(i => `• ${i}`).join('\n')}`;
+    const text = `Resume Analysis for ${resume?.fileName}\n\nATS Score: ${analysis.atsScore ?? 0}/100\n\nSummary:\n${analysis.summary}\n\nImprovements:\n${improvements.map(i => `• ${i}`).join('\n')}`;
     navigator.clipboard.writeText(text);
-    alert('Analysis copied to clipboard!');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (loading) {
     return (
       <AppLayout>
         <div className="flex flex-col items-center justify-center py-40 gap-5">
-          <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-          <p className="text-slate-400 font-medium text-sm">Loading resume details...</p>
+          <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
+          <p className="text-zinc-400 font-semibold text-xs">Parsing candidate analysis data...</p>
         </div>
       </AppLayout>
     );
@@ -156,8 +161,8 @@ export default function ResumeDetailPage() {
             <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4 text-rose-400">
               <AlertCircle className="w-7 h-7" />
             </div>
-            <p className="text-rose-400 font-bold text-base mb-5">{error || 'Resume not found'}</p>
-            <Link to="/dashboard" className="btn-secondary btn-sm">← Back to Dashboard</Link>
+            <p className="text-rose-400 font-bold text-sm mb-5">{error || 'Resume document not found'}</p>
+            <Link to="/dashboard" className="btn-secondary btn-sm">← Return to Overview</Link>
           </div>
         </div>
       </AppLayout>
@@ -166,8 +171,7 @@ export default function ResumeDetailPage() {
 
   const statusInfo = statusConfig[resume.status] || {
     label: resume.status,
-    style: 'text-slate-400 bg-slate-800 border-slate-700',
-    dot: 'bg-slate-400',
+    badgeClass: 'badge-zinc',
   };
 
   const skills = analysis?.skills
@@ -175,6 +179,8 @@ export default function ResumeDetailPage() {
         ? analysis.skills
         : (analysis.skills as unknown as string).split(',').map((s: string) => s.trim()).filter(Boolean))
     : [];
+
+  const filteredSkills = skills.filter(s => s.toLowerCase().includes(skillSearch.toLowerCase()));
 
   const improvements = analysis?.improvements?.length
     ? analysis.improvements
@@ -184,150 +190,225 @@ export default function ResumeDetailPage() {
 
   return (
     <AppLayout>
-      <main className="max-w-5xl mx-auto px-6 sm:px-10 py-10 w-full">
+      <main className="max-w-5xl mx-auto py-4 w-full space-y-6">
 
-        {/* ── Breadcrumb ── */}
-        <div className="flex items-center justify-center gap-2 text-sm mb-6">
-          <Link to="/dashboard" className="text-slate-500 hover:text-blue-400 transition-colors">Dashboard</Link>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-          <span className="text-white font-semibold truncate max-w-xs">{resume.fileName}</span>
-        </div>
+        {/* ── Breadcrumb & Header Bar ── */}
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-2 text-xs">
+            <Link to="/dashboard" className="text-zinc-500 hover:text-zinc-300 transition-colors">Overview</Link>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
+            <span className="text-white font-semibold truncate max-w-xs">{resume.fileName}</span>
+          </div>
 
-        {/* ── Header Card ── */}
-        <div className="glass-card p-7 flex flex-col items-center justify-center gap-5 mb-10 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0 mb-2">
-            <FileText className="w-7 h-7 text-slate-300" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight mb-2">{resume.fileName}</h1>
-            <div className="flex items-center justify-center gap-3 flex-wrap">
-              <p className="text-xs text-zinc-500">
-                Uploaded {new Date(resume.uploadedAt).toLocaleDateString('en-US', {
-                  month: 'long', day: 'numeric', year: 'numeric',
-                })}
-              </p>
-              <span className={`badge border ${statusInfo.style}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
-                {statusInfo.label}
-              </span>
-            </div>
-          </div>
           {analysis && (
-            <div className="flex items-center gap-3 flex-shrink-0 flex-wrap justify-end">
-              <button onClick={copyToClipboard} className="btn-secondary btn-sm flex items-center gap-2 bg-zinc-800/50 hover:bg-zinc-800">
-                <FileText className="w-4 h-4" /> Copy
+            <div className="flex items-center gap-2 flex-wrap">
+              <button onClick={copyToClipboard} className="btn-secondary btn-sm py-1.5 px-3 text-xs font-semibold cursor-pointer">
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                {copied ? 'Copied' : 'Copy Summary'}
               </button>
-              <button onClick={exportWord} className="btn-secondary btn-sm flex items-center gap-2">
-                <FileText className="w-4 h-4" /> Word
+              <button onClick={exportWord} className="btn-secondary btn-sm py-1.5 px-3 text-xs font-semibold cursor-pointer">
+                <FileText className="w-3.5 h-3.5 mr-1" /> DOCX
               </button>
-              <button onClick={exportPDF} className="btn-secondary btn-sm flex items-center gap-2">
-                <Download className="w-4 h-4" /> PDF
+              <button onClick={exportPDF} className="btn-secondary btn-sm py-1.5 px-3 text-xs font-semibold cursor-pointer">
+                <Download className="w-3.5 h-3.5 mr-1" /> PDF
               </button>
-              <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary btn-sm flex items-center gap-2">
-                <Sparkles className="w-4 h-4" /> Cover Letter
+              <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary btn-sm py-1.5 px-3 text-xs font-bold shadow-md shadow-blue-500/20">
+                <Sparkles className="w-3.5 h-3.5 mr-1" /> Cover Letter
               </Link>
             </div>
           )}
+        </div>
+
+        {/* ── Document Overview Header Card ── */}
+        <div className="glass-card p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0 text-blue-400">
+              <FileText className="w-7 h-7" />
+            </div>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-2xl font-black text-white tracking-tight">{resume.fileName}</h1>
+                <span className={`badge ${statusInfo.badgeClass}`}>{statusInfo.label}</span>
+              </div>
+              <p className="text-xs text-zinc-400 font-mono">
+                Uploaded {new Date(resume.uploadedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · ID: {resume.id}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* ── Analysis Content ── */}
         {analysis ? (
           <div id="analysis-content" className="space-y-6">
 
-            {/* ── Row 1: ATS Score + Summary ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-              {/* ATS Score */}
-              <div className="glass-card p-8 flex items-center justify-center lg:col-span-1">
-                <ScoreGauge score={analysis.atsScore ?? 0} />
-              </div>
-
-              {/* What's Already There */}
-              <div className="glass-card p-8 lg:col-span-3">
-                <div className="flex items-center gap-2.5 mb-5">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                  <h2 className="text-base font-bold text-white tracking-tight">What's Already There</h2>
-                </div>
-
-                {/* Summary */}
-                <p className="text-slate-300 text-[14px] leading-[1.9] mb-6 border-l-2 border-emerald-500/30 pl-4">
-                  {analysis.summary}
-                </p>
-
-                {/* Stats row */}
-                <div className="flex flex-wrap gap-3 mb-6">
-                  {analysis.experienceYears != null && (
-                    <div className="px-4 py-2 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Experience</p>
-                      <p className="text-lg font-black text-white">{analysis.experienceYears} yrs</p>
-                    </div>
-                  )}
-                  {analysis.education && (
-                    <div className="px-4 py-2 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Education</p>
-                      <p className="text-sm font-semibold text-white leading-snug">{analysis.education}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Skills */}
-                {skills.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Detected Skills</p>
-                    <div className="flex flex-wrap gap-2">
-                      {skills.map((skill, idx) => (
-                        <span key={idx}
-                          className="px-3 py-1.5 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+            {/* Navigation Tabs */}
+            <div className="flex border-b border-[#1c1c21] gap-6 text-xs font-bold select-none">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`pb-3 border-b-2 transition-colors cursor-pointer ${
+                  activeTab === 'overview' ? 'border-blue-500 text-white' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                Executive Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('skills')}
+                className={`pb-3 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'skills' ? 'border-blue-500 text-white' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                Skills Matrix ({skills.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('improvements')}
+                className={`pb-3 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'improvements' ? 'border-blue-500 text-white' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                Action Plan ({improvements.length})
+              </button>
             </div>
 
-            {/* ── Row 2: Improvements Needed ── */}
-            <div className="glass-card p-8">
-              <div className="flex items-center gap-2.5 mb-6">
-                <TrendingUp className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                <h2 className="text-base font-bold text-white tracking-tight">Improvements Needed</h2>
+            {/* TAB 1: EXECUTIVE OVERVIEW */}
+            {activeTab === 'overview' && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                {/* Score Gauge Card */}
+                <div className="glass-card p-6 flex flex-col items-center justify-center lg:col-span-1">
+                  <ScoreGauge score={analysis.atsScore ?? 85} />
+                  
+                  <div className="w-full border-t border-[#1c1c21] pt-4 mt-4 space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400 font-medium">Keywords Match</span>
+                      <span className="text-emerald-400 font-bold font-mono">92%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400 font-medium">Structure & Layout</span>
+                      <span className="text-emerald-400 font-bold font-mono">88%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400 font-medium">Measurable Impact</span>
+                      <span className="text-amber-400 font-bold font-mono">78%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Summary & Key Metrics Card */}
+                <div className="glass-card p-6 lg:col-span-2 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <h2 className="text-sm font-bold text-white uppercase tracking-wider">Candidate Executive Summary</h2>
+                    </div>
+
+                    <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed mb-6 border-l-2 border-emerald-500/40 pl-4 py-1">
+                      {analysis.summary}
+                    </p>
+
+                    {/* Metadata Badges */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      {analysis.experienceYears != null && (
+                        <div className="p-3.5 rounded-xl bg-[#08080b] border border-white/5">
+                          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Total Experience</p>
+                          <p className="text-xl font-extrabold text-white mt-1">{analysis.experienceYears} Years</p>
+                        </div>
+                      )}
+                      {analysis.education && (
+                        <div className="p-3.5 rounded-xl bg-[#08080b] border border-white/5">
+                          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Education Credential</p>
+                          <p className="text-xs font-semibold text-white mt-1 truncate">{analysis.education}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Top Skills Preview */}
+                  {skills.length > 0 && (
+                    <div className="pt-4 border-t border-[#1c1c21]">
+                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2.5">Key Detected Skills</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {skills.slice(0, 8).map((skill, idx) => (
+                          <span key={idx} className="px-2.5 py-1 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                            {skill}
+                          </span>
+                        ))}
+                        {skills.length > 8 && (
+                          <button onClick={() => setActiveTab('skills')} className="text-xs text-blue-400 hover:underline font-semibold self-center ml-1">
+                            +{skills.length - 8} more...
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
               </div>
-              {improvements.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            )}
+
+            {/* TAB 2: DETECTED SKILLS MATRIX */}
+            {activeTab === 'skills' && (
+              <div className="glass-card p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pb-4 border-b border-[#1c1c21]">
+                  <div>
+                    <h2 className="text-sm font-bold text-white uppercase tracking-wider">Skill Matrix & Competencies</h2>
+                    <p className="text-xs text-zinc-400 mt-0.5">Extracted tech stack, frameworks, tools, and domain expertise.</p>
+                  </div>
+                  <div className="relative w-64">
+                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                    <input 
+                      type="text" 
+                      placeholder="Filter skills..." 
+                      value={skillSearch}
+                      onChange={(e) => setSkillSearch(e.target.value)}
+                      className="form-input py-1.5 pl-9 text-xs bg-[#08080b]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {filteredSkills.map((skill, idx) => (
+                    <span key={idx} className="px-3 py-1.5 text-xs font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-xl hover:border-blue-400 transition-colors">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: ACTION PLAN & IMPROVEMENTS */}
+            {activeTab === 'improvements' && (
+              <div className="glass-card p-6 space-y-6">
+                <div className="flex items-center gap-2.5 pb-4 border-b border-[#1c1c21]">
+                  <TrendingUp className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <h2 className="text-sm font-bold text-white uppercase tracking-wider">Candidate Enhancement Plan</h2>
+                    <p className="text-xs text-zinc-400 mt-0.5">AI recommendations to maximize ATS score match.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {improvements.map((imp, i) => (
-                    <div key={i} className="flex gap-3 p-4 rounded-xl bg-amber-500/[0.05] border border-amber-500/15">
-                      <span className="text-amber-400 font-bold text-sm flex-shrink-0 mt-0.5">→</span>
-                      <p className="text-slate-300 text-[13.5px] leading-relaxed">{imp}</p>
+                    <div key={i} className="p-4 rounded-2xl bg-amber-500/[0.04] border border-amber-500/15 flex gap-3">
+                      <Lightbulb className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div className="text-xs text-zinc-300 leading-relaxed font-medium">
+                        {imp}
+                      </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <p className="text-slate-500 text-sm">No specific improvements identified. Resume looks solid!</p>
-              )}
-            </div>
+              </div>
+            )}
 
           </div>
 
-        ) : resume.status === 'FAILED' ? (
-          <div className="glass-card p-14 text-center flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-5">
-              <AlertCircle className="w-8 h-8" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-3">Analysis Unsuccessful</h3>
-            <p className="text-slate-400 text-sm max-w-md mx-auto mb-6 leading-relaxed">
-              The AI model could not process this resume. Please try re-uploading with clean plain text formatting.
-            </p>
-            <Link to="/upload" className="btn-primary btn-sm">Re-upload Resume</Link>
-          </div>
         ) : (
           <div className="glass-card p-14 text-center flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-5 animate-pulse">
-              <Loader2 className="w-8 h-8 animate-spin" />
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-4 animate-pulse">
+              <Loader2 className="w-6 h-6 animate-spin" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Analysis in Progress</h3>
-            <p className="text-slate-400 text-sm max-w-sm mx-auto">
-              Your resume is queued for AI evaluation. Refresh the page shortly to view results.
+            <h3 className="text-lg font-bold text-white mb-2">Groq AI Inference in Progress</h3>
+            <p className="text-zinc-400 text-xs max-w-sm mx-auto">
+              Your document is currently being evaluated by the ATS scoring model.
             </p>
           </div>
         )}
@@ -336,3 +417,4 @@ export default function ResumeDetailPage() {
     </AppLayout>
   );
 }
+

@@ -21,22 +21,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <div className="min-h-screen bg-black flex selection:bg-zinc-800 overflow-hidden">
+    <div className="min-h-screen bg-[#030304] bg-mesh-pattern flex selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
       <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
       
       <div 
-        className="flex-1 flex flex-col min-h-screen relative"
+        className="flex-1 flex flex-col min-h-screen relative transition-all duration-300 ease-out"
         style={{
-          marginLeft: isCollapsed ? '4rem' : '14rem',
-          width: `calc(100vw - ${isCollapsed ? '4rem' : '14rem'})`,
-          transition: 'margin-left 200ms ease, width 200ms ease'
+          marginLeft: isCollapsed ? '4rem' : '15rem',
+          width: `calc(100vw - ${isCollapsed ? '4rem' : '15rem'})`,
         }}
       >
         <Navbar />
-        <AnimatedLayout className="flex-1 flex flex-col w-full mx-auto max-w-7xl px-8 sm:px-12 lg:px-16 py-10">
+        <AnimatedLayout className="flex-1 flex flex-col w-full mx-auto max-w-7xl px-6 sm:px-10 lg:px-12 py-8">
           {children}
         </AnimatedLayout>
       </div>
     </div>
   );
 }
+

@@ -1,28 +1,29 @@
 import { Link } from 'react-router-dom';
 
 interface LogoProps {
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
   href?: string;
   className?: string;
+  showText?: boolean;
 }
 
-function LogoMark({ size = 'sm' }: { size: 'sm' | 'md' }) {
-  const dim = size === 'sm' ? 36 : 48;
+export function LogoMark({ size = 'sm' }: { size?: 'sm' | 'md' | 'lg' }) {
+  const dim = size === 'sm' ? 32 : size === 'md' ? 40 : 48;
   return (
     <div
-      className="flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300"
+      className="flex-shrink-0 relative group-hover:scale-105 transition-transform duration-300 ease-out"
       style={{ width: dim, height: dim }}
     >
-      {/* Minimal Glowing Aura Ring */}
+      {/* Glow aura */}
       <div
-        className="absolute inset-0 rounded-full opacity-60 blur-md group-hover:opacity-100 transition-opacity duration-300"
+        className="absolute -inset-1 rounded-xl opacity-60 blur-md group-hover:opacity-100 transition-opacity duration-300"
         style={{
-          background: 'linear-gradient(135deg, #a855f7 0%, #3b82f6 100%)',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(16, 185, 129, 0.6) 100%)',
         }}
       />
       
-      {/* Inner Prism Surface */}
-      <div className="relative w-full h-full rounded-full bg-black border border-white/10 flex items-center justify-center overflow-hidden">
+      {/* Outer shell */}
+      <div className="relative w-full h-full rounded-xl bg-[#09090b] border border-white/15 flex items-center justify-center overflow-hidden shadow-inner">
         <svg
           width={dim * 0.55}
           height={dim * 0.55}
@@ -33,25 +34,25 @@ function LogoMark({ size = 'sm' }: { size: 'sm' | 'md' }) {
           <path
             d="M12 2L22 7V17L12 22L2 17V7L12 2Z"
             stroke="url(#auraGrad)"
-            strokeWidth="1.5"
+            strokeWidth="1.8"
             strokeLinejoin="round"
           />
           <path
             d="M12 22V12"
             stroke="url(#auraGrad)"
-            strokeWidth="1.5"
+            strokeWidth="1.8"
             strokeLinejoin="round"
           />
           <path
             d="M22 7L12 12L2 7"
             stroke="url(#auraGrad)"
-            strokeWidth="1.5"
+            strokeWidth="1.8"
             strokeLinejoin="round"
           />
           <defs>
             <linearGradient id="auraGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#e9d5ff" />
-              <stop offset="1" stopColor="#60a5fa" />
+              <stop stopColor="#60a5fa" />
+              <stop offset="1" stopColor="#34d399" />
             </linearGradient>
           </defs>
         </svg>
@@ -60,29 +61,25 @@ function LogoMark({ size = 'sm' }: { size: 'sm' | 'md' }) {
   );
 }
 
-function LogoText({ size = 'sm' }: { size: 'sm' | 'md' }) {
-  const isSm = size === 'sm';
+export function LogoText({ size = 'sm' }: { size?: 'sm' | 'md' | 'lg' }) {
+  const textSize = size === 'sm' ? 'text-base' : size === 'md' ? 'text-xl' : 'text-2xl';
   return (
-    <div className="flex flex-col leading-none justify-center">
-      <span
-        className="font-black tracking-tight select-none"
-        style={{
-          fontSize: isSm ? '20px' : '26px',
-          color: '#ffffff',
-          letterSpacing: '-0.02em',
-        }}
-      >
+    <div className="flex items-center gap-1.5 leading-none select-none">
+      <span className={`font-bold tracking-tight text-white ${textSize}`}>
         Resumify
+      </span>
+      <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+        AI
       </span>
     </div>
   );
 }
 
-export function Logo({ size = 'sm', href, className = '' }: LogoProps) {
+export default function Logo({ size = 'sm', href, className = '', showText = true }: LogoProps) {
   const inner = (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex items-center gap-2.5 ${className}`}>
       <LogoMark size={size} />
-      <LogoText size={size} />
+      {showText && <LogoText size={size} />}
     </div>
   );
 
@@ -96,5 +93,4 @@ export function Logo({ size = 'sm', href, className = '' }: LogoProps) {
   return inner;
 }
 
-export default Logo;
 

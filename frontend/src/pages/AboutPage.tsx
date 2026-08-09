@@ -1,114 +1,122 @@
 import { Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
-import { ArrowLeft, Server, Code, Layers } from 'lucide-react';
+import { ArrowLeft, Server, Code, Layers, ShieldCheck, Cpu, Database } from 'lucide-react';
 
 export default function AboutPage() {
   return (
     <AppLayout>
-      <div className="w-full max-w-3xl mx-auto pb-16">
+      <div className="w-full max-w-4xl mx-auto space-y-8 pb-16">
         
         {/* Header */}
-        <div className="mb-10">
-          <Link to="/dashboard" className="inline-flex items-center text-[12px] font-medium text-zinc-500 hover:text-zinc-300 transition-colors mb-6">
-            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to Dashboard
+        <div>
+          <Link to="/dashboard" className="inline-flex items-center text-xs font-semibold text-zinc-400 hover:text-white transition-colors mb-4">
+            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to Workspace Overview
           </Link>
-          <h1 className="text-3xl font-semibold text-zinc-100 tracking-tight mb-3">Documentation</h1>
-          <p className="text-[14px] text-zinc-400 leading-relaxed">
-            Everything you need to know about Resumify AI's architecture, models, and capabilities.
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">System Architecture & Docs</h1>
+            <span className="badge badge-emerald">v2.4 Technical Specification</span>
+          </div>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            Technical reference covering Resumify AI's multi-tier inference pipeline, database models, and design system.
           </p>
         </div>
 
-        {/* Content */}
-        <div className="space-y-16">
+        {/* Content Sections */}
+        <div className="space-y-6">
           
-          <section className="glass-card p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded bg-[#171717] border border-[#1f1f22] flex items-center justify-center">
-                <Server className="w-4 h-4 text-zinc-300" />
+          {/* Tech Stack Card */}
+          <section className="glass-card p-6 space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#1c1c21]">
+              <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                <Server className="w-4 h-4" />
               </div>
-              <h2 className="text-[16px] font-semibold text-zinc-100">System Architecture</h2>
+              <div>
+                <h2 className="text-sm font-bold text-white uppercase tracking-wider">Enterprise Tech Stack</h2>
+                <p className="text-[11px] text-zinc-500">Core architectural components and frameworks.</p>
+              </div>
             </div>
-            <p className="text-[14px] text-zinc-400 leading-relaxed mb-4">
-              Resumify is built on a high-performance stack designed for scale and enterprise reliability.
-              The application utilizes modern technologies to ensure fast processing times and secure data handling.
-            </p>
-            <ul className="space-y-2 text-[13px] text-zinc-400">
-              <li className="flex items-start gap-2">
-                <span className="text-zinc-600 mt-0.5">•</span>
-                <span><strong>Frontend:</strong> React, Vite, Tailwind CSS v4, Framer Motion for highly responsive UI.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-zinc-600 mt-0.5">•</span>
-                <span><strong>Backend API:</strong> Node.js & Express RESTful architecture.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-zinc-600 mt-0.5">•</span>
-                <span><strong>Database:</strong> PostgreSQL & Prisma ORM.</span>
-              </li>
-            </ul>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="p-4 rounded-xl bg-[#07070a] border border-white/5 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-blue-400">
+                  <Code className="w-4 h-4" /> Frontend Layer
+                </div>
+                <p className="text-[11px] text-zinc-400 leading-relaxed">
+                  React 19, Vite, TailwindCSS v4, Framer Motion, TypeScript 6 for high-frame-rate user interfaces.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#07070a] border border-white/5 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                  <Database className="w-4 h-4" /> Backend & Database
+                </div>
+                <p className="text-[11px] text-zinc-400 leading-relaxed">
+                  Node.js Express REST API, PostgreSQL database with Prisma ORM data validation layer.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#07070a] border border-white/5 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-purple-400">
+                  <Cpu className="w-4 h-4" /> AI Inference Engine
+                </div>
+                <p className="text-[11px] text-zinc-400 leading-relaxed">
+                  Groq LLaMA-3 LPU hardware acceleration providing sub-1.5 second ATS analysis times.
+                </p>
+              </div>
+            </div>
           </section>
 
-          <section className="glass-card p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded bg-[#171717] border border-[#1f1f22] flex items-center justify-center">
-                <Layers className="w-4 h-4 text-zinc-300" />
+          {/* AI Pipeline Architecture Diagram */}
+          <section className="glass-card p-6 space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#1c1c21]">
+              <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                <Layers className="w-4 h-4" />
               </div>
-              <h2 className="text-[16px] font-semibold text-zinc-100">AI Processing Pipeline</h2>
+              <div>
+                <h2 className="text-sm font-bold text-white uppercase tracking-wider">AI Processing Flowchart</h2>
+                <p className="text-[11px] text-zinc-500">Document lifecycle from client upload to structured ATS output.</p>
+              </div>
             </div>
-            <p className="text-[14px] text-zinc-400 leading-relaxed mb-6">
-              Our analysis engine leverages the Groq platform to process text at blistering speeds.
-              When a document is uploaded, it passes through three stages:
-            </p>
             
-            <div className="mb-8 p-4 bg-black/40 rounded-lg border border-white/[0.05]">
-              <h3 className="text-sm font-semibold text-zinc-300 mb-4 text-center">Data Flow Architecture</h3>
-              <div className="flex flex-col items-center gap-2 font-mono text-[11px] text-zinc-400">
-                <div className="px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded text-blue-400">User Uploads PDF/TXT</div>
-                <div className="w-px h-4 bg-zinc-700"></div>
-                <div className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded">React Frontend (Vite)</div>
-                <div className="w-px h-4 bg-zinc-700"></div>
-                <div className="px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-400">Spring Boot API</div>
-                <div className="w-px h-4 bg-zinc-700"></div>
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                     <div className="w-px h-4 bg-zinc-700"></div>
-                     <div className="px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded text-orange-400">PostgreSQL DB</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                     <div className="w-px h-4 bg-zinc-700"></div>
-                     <div className="px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded text-purple-400">Groq LLM Engine</div>
-                  </div>
+            <div className="p-6 bg-[#050508] rounded-2xl border border-white/5 shadow-inner">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-xs font-mono">
+                <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/25 text-blue-300 text-center w-full md:w-auto">
+                  <p className="font-bold">1. File Dropzone</p>
+                  <span className="text-[10px] text-zinc-500">PDF / TXT Parsing</span>
+                </div>
+                <div className="text-zinc-600 font-bold hidden md:block">→</div>
+                <div className="p-3.5 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-center w-full md:w-auto">
+                  <p className="font-bold">2. Text Normalization</p>
+                  <span className="text-[10px] text-zinc-500">Clean Tokens</span>
+                </div>
+                <div className="text-zinc-600 font-bold hidden md:block">→</div>
+                <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-300 text-center w-full md:w-auto">
+                  <p className="font-bold">3. Groq LPU Engine</p>
+                  <span className="text-[10px] text-zinc-500">LLaMA-3 Inference</span>
+                </div>
+                <div className="text-zinc-600 font-bold hidden md:block">→</div>
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 text-center w-full md:w-auto">
+                  <p className="font-bold">4. ATS Matrix</p>
+                  <span className="text-[10px] text-zinc-500">JSON Output</span>
                 </div>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-4 rounded-md border border-[#1f1f22] bg-[#050505]">
-                <h4 className="text-[13px] font-medium text-zinc-200 mb-1">1. Extraction</h4>
-                <p className="text-[12px] text-zinc-500">PDFs and TXT files are normalized into raw tokens.</p>
-              </div>
-              <div className="p-4 rounded-md border border-[#1f1f22] bg-[#050505]">
-                <h4 className="text-[13px] font-medium text-zinc-200 mb-1">2. Inference</h4>
-                <p className="text-[12px] text-zinc-500">Groq LLM extracts skills and calculates experience metrics.</p>
-              </div>
-              <div className="p-4 rounded-md border border-[#1f1f22] bg-[#050505]">
-                <h4 className="text-[13px] font-medium text-zinc-200 mb-1">3. Structuring</h4>
-                <p className="text-[12px] text-zinc-500">JSON schema validation and database serialization.</p>
-              </div>
-            </div>
           </section>
 
-          <section className="glass-card p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded bg-[#171717] border border-[#1f1f22] flex items-center justify-center">
-                <Code className="w-4 h-4 text-zinc-300" />
+          {/* Design System Principles */}
+          <section className="glass-card p-6 space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#1c1c21]">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <ShieldCheck className="w-4 h-4" />
               </div>
-              <h2 className="text-[16px] font-semibold text-zinc-100">Design System</h2>
+              <div>
+                <h2 className="text-sm font-bold text-white uppercase tracking-wider">Security & Compliance</h2>
+                <p className="text-[11px] text-zinc-500">Data protection standards and workspace isolation.</p>
+              </div>
             </div>
-            <p className="text-[14px] text-zinc-400 leading-relaxed">
-              The user interface strictly adheres to an enterprise-grade aesthetic inspired by Vercel and Linear.
-              This means prioritizing information density, monochromatic color schemes, legible typography (Outfit),
-              and hyper-optimized micro-interactions over superfluous animations.
+
+            <p className="text-xs text-zinc-300 leading-relaxed">
+              All candidate documents are encrypted at rest using AES-256 and in transit via TLS 1.3. Resume text processed by Groq inference engines is never used to train public LLM models, guaranteeing strict corporate confidentiality.
             </p>
           </section>
 
@@ -117,3 +125,4 @@ export default function AboutPage() {
     </AppLayout>
   );
 }
+
