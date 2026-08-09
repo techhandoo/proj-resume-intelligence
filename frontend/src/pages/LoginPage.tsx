@@ -31,7 +31,14 @@ export default function LoginPage() {
       saveAuth(res.data);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid email or password.');
+      console.error("Login error:", err);
+      if (err.message === 'Network Error') {
+        setError('Network Error: Cannot reach the backend. If on Vercel, check VITE_API_BASE_URL and CORS.');
+      } else if (err.response?.status === 404) {
+        setError('404 Not Found: The API endpoint does not exist on this domain.');
+      } else {
+        setError(err.response?.data?.message || 'Invalid email or password.');
+      }
     }
   };
 

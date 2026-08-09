@@ -32,7 +32,14 @@ export default function RegisterPage() {
       saveAuth(res.data);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      console.error("Registration error:", err);
+      if (err.message === 'Network Error') {
+        setError('Network Error: Cannot reach the backend. If on Vercel, check VITE_API_BASE_URL and CORS.');
+      } else if (err.response?.status === 404) {
+        setError('404 Not Found: The API endpoint does not exist on this domain.');
+      } else {
+        setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      }
     }
   };
 
