@@ -52,7 +52,7 @@ export default function TemplatesPage() {
         </div>
 
         {/* Templates Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
           {filteredTemplates.length === 0 ? (
             <div className="col-span-full py-20 text-center">
               <FileText className="w-10 h-10 text-zinc-700 mx-auto mb-4" />

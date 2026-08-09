@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import api from '../lib/api';
-import { saveAuth } from '../lib/auth';
+import { saveAuth, isAuthenticated } from '../lib/auth';
 import AnimatedLayout from '../components/AnimatedLayout';
 import { Command, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 
@@ -24,6 +24,12 @@ export default function RegisterPage() {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate]);
 
   const onSubmit = async (data: RegisterFormValues) => {
     setError('');

@@ -78,7 +78,7 @@ export default function DashboardPage() {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="glass-card p-5">
             <div className="flex justify-between items-start mb-4">
               <span className="text-[13px] font-medium text-zinc-400">Total Resumes</span>
@@ -127,7 +127,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           
           {/* Data Table (Spans 2 columns) */}
           <div className="lg:col-span-2 flex flex-col">
