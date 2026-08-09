@@ -39,7 +39,8 @@ function ScoreGauge({ score }: { score: number }) {
   const radius = 58;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (circumference * score) / 100;
-  const color = score >= 75 ? '#34d399' : score >= 50 ? '#fbbf24' : '#f87171';
+  const tone = score >= 75 ? 'var(--color-success)' : score >= 50 ? 'var(--color-warning)' : 'var(--color-danger)';
+  const glow = `drop-shadow(0 0 10px color-mix(in oklab, ${tone} 30%, transparent))`;
   const label = score >= 75 ? 'Superior' : score >= 50 ? 'Moderate' : 'Needs Work';
   const badgeClass = score >= 75 ? 'badge-emerald' : score >= 50 ? 'badge-amber' : 'badge-rose';
 
@@ -47,25 +48,25 @@ function ScoreGauge({ score }: { score: number }) {
     <div className="flex flex-col items-center justify-center gap-4">
       <div className="relative w-40 h-40 flex items-center justify-center">
         <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 136 136">
-          <circle cx="68" cy="68" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" />
+          <circle cx="68" cy="68" r={radius} fill="none" stroke="var(--color-border)" strokeWidth="12" />
           <circle
             cx="68" cy="68" r={radius}
             fill="none"
-            stroke={color}
+            stroke={tone}
             strokeWidth="12"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            style={{ transition: 'stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1)', filter: `drop-shadow(0 0 10px ${color}50)` }}
+            style={{ transition: 'stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1)', filter: glow }}
           />
         </svg>
         <div className="z-10 text-center">
-          <span className="text-4xl font-black text-white leading-none tracking-tight">{score}</span>
-          <span className="text-xs text-zinc-500 font-mono block mt-0.5">/ 100</span>
+          <span className="text-4xl font-black text-text-primary leading-none tracking-tight">{score}</span>
+          <span className="text-xs text-text-muted font-mono block mt-0.5">/ 100</span>
         </div>
       </div>
       <div className="text-center">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">ATS Compatibility Rating</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-1">ATS Compatibility Rating</p>
         <span className={`badge ${badgeClass}`}>{label} Match</span>
       </div>
     </div>
@@ -146,8 +147,8 @@ export default function ResumeDetailPage() {
     return (
       <AppLayout>
         <div className="flex flex-col items-center justify-center py-40 gap-5">
-          <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
-          <p className="text-zinc-400 font-semibold text-xs">Parsing candidate analysis data...</p>
+          <Loader2 className="w-10 h-10 text-[var(--color-accent-strong)] animate-spin" />
+          <p className="text-text-muted font-semibold text-xs">Parsing candidate analysis data...</p>
         </div>
       </AppLayout>
     );
@@ -158,10 +159,10 @@ export default function ResumeDetailPage() {
       <AppLayout>
         <div className="max-w-2xl mx-auto px-6 py-16 flex justify-center">
           <div className="glass-card p-12 text-center w-full">
-            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4 text-rose-400">
+            <div className="w-14 h-14 rounded-2xl bg-[var(--color-danger-soft)] border border-[color:var(--color-danger)]/20 flex items-center justify-center mx-auto mb-4 text-[var(--color-danger)]">
               <AlertCircle className="w-7 h-7" />
             </div>
-            <p className="text-rose-400 font-bold text-sm mb-5">{error || 'Resume document not found'}</p>
+            <p className="text-[var(--color-danger)] font-bold text-sm mb-5">{error || 'Resume document not found'}</p>
             <Link to="/dashboard" className="btn-secondary btn-sm">← Return to Overview</Link>
           </div>
         </div>
@@ -195,15 +196,15 @@ export default function ResumeDetailPage() {
         {/* ── Breadcrumb & Header Bar ── */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2 text-xs">
-            <Link to="/dashboard" className="text-zinc-500 hover:text-zinc-300 transition-colors">Overview</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-            <span className="text-white font-semibold truncate max-w-xs">{resume.fileName}</span>
+            <Link to="/dashboard" className="text-text-muted hover:text-text-primary transition-colors">Overview</Link>
+            <ChevronRight className="w-3.5 h-3.5 text-text-subtle" />
+            <span className="text-text-primary font-semibold truncate max-w-xs">{resume.fileName}</span>
           </div>
 
           {analysis && (
             <div className="flex items-center gap-2 flex-wrap">
               <button onClick={copyToClipboard} className="btn-secondary btn-sm py-1.5 px-3 text-xs font-semibold cursor-pointer">
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-[var(--color-success)] mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
                 {copied ? 'Copied' : 'Copy Summary'}
               </button>
               <button onClick={exportWord} className="btn-secondary btn-sm py-1.5 px-3 text-xs font-semibold cursor-pointer">
@@ -212,7 +213,7 @@ export default function ResumeDetailPage() {
               <button onClick={exportPDF} className="btn-secondary btn-sm py-1.5 px-3 text-xs font-semibold cursor-pointer">
                 <Download className="w-3.5 h-3.5 mr-1" /> PDF
               </button>
-              <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary btn-sm py-1.5 px-3 text-xs font-bold shadow-md shadow-blue-500/20">
+              <Link to={`/cover-letter?resumeId=${resume.id}`} className="btn-primary btn-sm py-1.5 px-3 text-xs font-bold shadow-md shadow-accent/20">
                 <Sparkles className="w-3.5 h-3.5 mr-1" /> Cover Letter
               </Link>
             </div>
@@ -222,15 +223,15 @@ export default function ResumeDetailPage() {
         {/* ── Document Overview Header Card ── */}
         <div className="glass-card p-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0 text-blue-400">
+            <div className="w-14 h-14 rounded-2xl bg-accent-soft border border-accent/25 flex items-center justify-center flex-shrink-0 text-[var(--color-accent-strong)]">
               <FileText className="w-7 h-7" />
             </div>
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-black text-white tracking-tight">{resume.fileName}</h1>
+                <h1 className="text-2xl font-black text-text-primary tracking-tight">{resume.fileName}</h1>
                 <span className={`badge ${statusInfo.badgeClass}`}>{statusInfo.label}</span>
               </div>
-              <p className="text-xs text-zinc-400 font-mono">
+              <p className="text-xs text-[var(--color-text-muted)] tabular">
                 Uploaded {new Date(resume.uploadedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · ID: {resume.id}
               </p>
             </div>
@@ -242,11 +243,11 @@ export default function ResumeDetailPage() {
           <div id="analysis-content" className="space-y-6">
 
             {/* Navigation Tabs */}
-            <div className="flex border-b border-[#1c1c21] gap-6 text-xs font-bold select-none">
+            <div className="flex border-b border-border gap-6 text-xs font-bold select-none">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`pb-3 border-b-2 transition-colors cursor-pointer ${
-                  activeTab === 'overview' ? 'border-blue-500 text-white' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                  activeTab === 'overview' ? 'border-accent text-text-primary' : 'border-transparent text-text-muted hover:text-text-primary'
                 }`}
               >
                 Executive Overview
@@ -254,7 +255,7 @@ export default function ResumeDetailPage() {
               <button
                 onClick={() => setActiveTab('skills')}
                 className={`pb-3 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'skills' ? 'border-blue-500 text-white' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                  activeTab === 'skills' ? 'border-accent text-text-primary' : 'border-transparent text-text-muted hover:text-text-primary'
                 }`}
               >
                 Skills Matrix ({skills.length})
@@ -262,7 +263,7 @@ export default function ResumeDetailPage() {
               <button
                 onClick={() => setActiveTab('improvements')}
                 className={`pb-3 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'improvements' ? 'border-blue-500 text-white' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                  activeTab === 'improvements' ? 'border-accent text-text-primary' : 'border-transparent text-text-muted hover:text-text-primary'
                 }`}
               >
                 Action Plan ({improvements.length})
@@ -277,18 +278,18 @@ export default function ResumeDetailPage() {
                 <div className="glass-card p-6 flex flex-col items-center justify-center lg:col-span-1">
                   <ScoreGauge score={analysis.atsScore ?? 85} />
                   
-                  <div className="w-full border-t border-[#1c1c21] pt-4 mt-4 space-y-2 text-xs">
+                  <div className="w-full border-t border-border pt-4 mt-4 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 font-medium">Keywords Match</span>
-                      <span className="text-emerald-400 font-bold font-mono">92%</span>
+                      <span className="text-text-muted font-medium">Total Experience</span>
+                      <span className="text-[var(--color-text-secondary)] font-bold tabular">{analysis.experienceYears ?? '—'} yrs</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 font-medium">Structure & Layout</span>
-                      <span className="text-emerald-400 font-bold font-mono">88%</span>
+                      <span className="text-text-muted font-medium">Skills Detected</span>
+                      <span className="text-[var(--color-text-secondary)] font-bold tabular">{skills.length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 font-medium">Measurable Impact</span>
-                      <span className="text-amber-400 font-bold font-mono">78%</span>
+                      <span className="text-text-muted font-medium">Action Items</span>
+                      <span className="text-[var(--color-text-secondary)] font-bold tabular">{improvements.length}</span>
                     </div>
                   </div>
                 </div>
@@ -297,26 +298,26 @@ export default function ResumeDetailPage() {
                 <div className="glass-card p-6 lg:col-span-2 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <h2 className="text-sm font-bold text-white uppercase tracking-wider">Candidate Executive Summary</h2>
+                      <CheckCircle2 className="w-4 h-4 text-[var(--color-success)]" />
+                      <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Candidate Executive Summary</h2>
                     </div>
 
-                    <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed mb-6 border-l-2 border-emerald-500/40 pl-4 py-1">
+                    <p className="text-text-secondary text-xs sm:text-sm leading-relaxed mb-6 border-l-2 border-[color:var(--color-success)]/45 pl-4 py-1">
                       {analysis.summary}
                     </p>
 
                     {/* Metadata Badges */}
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       {analysis.experienceYears != null && (
-                        <div className="p-3.5 rounded-xl bg-[#08080b] border border-white/5">
-                          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Total Experience</p>
-                          <p className="text-xl font-extrabold text-white mt-1">{analysis.experienceYears} Years</p>
+                        <div className="p-3.5 rounded-xl bg-raised border border-border">
+                          <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Total Experience</p>
+                          <p className="text-xl font-extrabold text-text-primary mt-1">{analysis.experienceYears} Years</p>
                         </div>
                       )}
                       {analysis.education && (
-                        <div className="p-3.5 rounded-xl bg-[#08080b] border border-white/5">
-                          <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Education Credential</p>
-                          <p className="text-xs font-semibold text-white mt-1 truncate">{analysis.education}</p>
+                        <div className="p-3.5 rounded-xl bg-raised border border-border">
+                          <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">Education Credential</p>
+                          <p className="text-xs font-semibold text-text-primary mt-1 truncate">{analysis.education}</p>
                         </div>
                       )}
                     </div>
@@ -324,16 +325,16 @@ export default function ResumeDetailPage() {
 
                   {/* Top Skills Preview */}
                   {skills.length > 0 && (
-                    <div className="pt-4 border-t border-[#1c1c21]">
-                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2.5">Key Detected Skills</p>
+                    <div className="pt-4 border-t border-border">
+                      <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2.5">Key Detected Skills</p>
                       <div className="flex flex-wrap gap-1.5">
                         {skills.slice(0, 8).map((skill, idx) => (
-                          <span key={idx} className="px-2.5 py-1 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                          <span key={idx} className="px-2.5 py-1 text-xs font-semibold text-[var(--color-success)] bg-[var(--color-success-soft)] border border-[color:var(--color-success)]/25 rounded-lg">
                             {skill}
                           </span>
                         ))}
                         {skills.length > 8 && (
-                          <button onClick={() => setActiveTab('skills')} className="text-xs text-blue-400 hover:underline font-semibold self-center ml-1">
+                          <button onClick={() => setActiveTab('skills')} className="text-xs text-[var(--color-accent-strong)] hover:underline font-semibold self-center ml-1">
                             +{skills.length - 8} more...
                           </button>
                         )}
@@ -348,26 +349,26 @@ export default function ResumeDetailPage() {
             {/* TAB 2: DETECTED SKILLS MATRIX */}
             {activeTab === 'skills' && (
               <div className="glass-card p-6 space-y-6">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pb-4 border-b border-[#1c1c21]">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pb-4 border-b border-border">
                   <div>
-                    <h2 className="text-sm font-bold text-white uppercase tracking-wider">Skill Matrix & Competencies</h2>
-                    <p className="text-xs text-zinc-400 mt-0.5">Extracted tech stack, frameworks, tools, and domain expertise.</p>
+                    <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Skill Matrix & Competencies</h2>
+                    <p className="text-xs text-text-muted mt-0.5">Extracted tech stack, frameworks, tools, and domain expertise.</p>
                   </div>
                   <div className="relative w-64">
-                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
                     <input 
                       type="text" 
                       placeholder="Filter skills..." 
                       value={skillSearch}
                       onChange={(e) => setSkillSearch(e.target.value)}
-                      className="form-input py-1.5 pl-9 text-xs bg-[#08080b]"
+                      className="form-input py-1.5 pl-9 text-xs bg-raised"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
                   {filteredSkills.map((skill, idx) => (
-                    <span key={idx} className="px-3 py-1.5 text-xs font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-xl hover:border-blue-400 transition-colors">
+                    <span key={idx} className="px-3 py-1.5 text-xs font-semibold text-[var(--color-accent-strong)] bg-accent-soft border border-accent/25 rounded-xl hover:border-accent-strong transition-colors">
                       {skill}
                     </span>
                   ))}
@@ -378,19 +379,19 @@ export default function ResumeDetailPage() {
             {/* TAB 3: ACTION PLAN & IMPROVEMENTS */}
             {activeTab === 'improvements' && (
               <div className="glass-card p-6 space-y-6">
-                <div className="flex items-center gap-2.5 pb-4 border-b border-[#1c1c21]">
-                  <TrendingUp className="w-5 h-5 text-amber-400" />
+                <div className="flex items-center gap-2.5 pb-4 border-b border-border">
+                  <TrendingUp className="w-5 h-5 text-[var(--color-warning)]" />
                   <div>
-                    <h2 className="text-sm font-bold text-white uppercase tracking-wider">Candidate Enhancement Plan</h2>
-                    <p className="text-xs text-zinc-400 mt-0.5">AI recommendations to maximize ATS score match.</p>
+                    <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Candidate Enhancement Plan</h2>
+                    <p className="text-xs text-text-muted mt-0.5">AI recommendations to maximize ATS score match.</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {improvements.map((imp, i) => (
-                    <div key={i} className="p-4 rounded-2xl bg-amber-500/[0.04] border border-amber-500/15 flex gap-3">
-                      <Lightbulb className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                      <div className="text-xs text-zinc-300 leading-relaxed font-medium">
+                    <div key={i} className="p-4 rounded-2xl bg-[var(--color-warning-soft)] border border-[color:var(--color-warning)]/20 flex gap-3">
+                      <Lightbulb className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" />
+                      <div className="text-xs text-text-secondary leading-relaxed font-medium">
                         {imp}
                       </div>
                     </div>
@@ -403,11 +404,11 @@ export default function ResumeDetailPage() {
 
         ) : (
           <div className="glass-card p-14 text-center flex flex-col items-center">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mx-auto mb-4 animate-pulse">
+            <div className="w-12 h-12 rounded-2xl bg-accent-soft border border-accent/25 flex items-center justify-center text-[var(--color-accent-strong)] mx-auto mb-4 animate-pulse">
               <Loader2 className="w-6 h-6 animate-spin" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Groq AI Inference in Progress</h3>
-            <p className="text-zinc-400 text-xs max-w-sm mx-auto">
+            <h3 className="text-lg font-bold text-text-primary mb-2">Groq AI Inference in Progress</h3>
+            <p className="text-text-muted text-xs max-w-sm mx-auto">
               Your document is currently being evaluated by the ATS scoring model.
             </p>
           </div>

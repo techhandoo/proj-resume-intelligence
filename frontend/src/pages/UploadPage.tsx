@@ -147,8 +147,8 @@ export default function UploadPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">Upload Candidate Resume</h1>
-            <p className="text-xs text-zinc-400 mt-1">
+            <h1 className="text-3xl font-extrabold text-text-primary tracking-tight">Upload Candidate Resume</h1>
+            <p className="text-xs text-text-muted mt-1">
               Ingest a PDF or plain text resume to run real-time Groq LLM parsing and ATS evaluation.
             </p>
           </div>
@@ -156,32 +156,32 @@ export default function UploadPage() {
           <button
             type="button"
             onClick={loadSampleData}
-            className="btn-secondary py-2 px-4 text-xs font-semibold flex items-center gap-2 border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20"
+            className="btn-secondary py-2 px-4 text-xs font-semibold flex items-center gap-2 border-accent/35 bg-accent-soft text-[var(--color-accent-strong)] hover:bg-accent-soft"
           >
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Load Sample Engineer Resume
+            <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent-strong)]" /> Load Sample Engineer Resume
           </button>
         </div>
 
         {/* Workflow Steps Indicator */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="glass-card p-3.5 flex items-center gap-3 border-blue-500/30">
-            <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 font-extrabold text-xs flex items-center justify-center">1</div>
-            <div className="text-xs"><p className="font-bold text-white">Upload File</p><p className="text-[10px] text-zinc-500">PDF or TXT document</p></div>
+          <div className="glass-card p-3.5 flex items-center gap-3 border-accent/35">
+            <div className="w-7 h-7 rounded-lg bg-accent-soft text-[var(--color-accent-strong)] font-extrabold text-xs flex items-center justify-center">1</div>
+            <div className="text-xs"><p className="font-bold text-text-primary">Upload File</p><p className="text-[10px] text-text-muted">PDF or TXT document</p></div>
           </div>
-          <div className={`glass-card p-3.5 flex items-center gap-3 ${contentValue.length > 10 ? 'border-blue-500/30' : ''}`}>
-            <div className="w-7 h-7 rounded-lg bg-zinc-800 text-zinc-300 font-extrabold text-xs flex items-center justify-center">2</div>
-            <div className="text-xs"><p className="font-bold text-white">Review Text</p><p className="text-[10px] text-zinc-500">Normalized content</p></div>
+          <div className={`glass-card p-3.5 flex items-center gap-3 ${contentValue.length > 10 ? 'border-accent/35' : ''}`}>
+            <div className="w-7 h-7 rounded-lg bg-subtle text-text-secondary font-extrabold text-xs flex items-center justify-center">2</div>
+            <div className="text-xs"><p className="font-bold text-text-primary">Review Text</p><p className="text-[10px] text-text-muted">Normalized content</p></div>
           </div>
           <div className="glass-card p-3.5 flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-zinc-800 text-zinc-300 font-extrabold text-xs flex items-center justify-center">3</div>
-            <div className="text-xs"><p className="font-bold text-white">Run AI Engine</p><p className="text-[10px] text-zinc-500">Groq LLM inference</p></div>
+            <div className="w-7 h-7 rounded-lg bg-subtle text-text-secondary font-extrabold text-xs flex items-center justify-center">3</div>
+            <div className="text-xs"><p className="font-bold text-text-primary">Run AI Engine</p><p className="text-[10px] text-text-muted">Groq LLM inference</p></div>
           </div>
         </div>
 
         {error && (
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/25 flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
-            <p className="text-rose-400 text-xs font-semibold leading-relaxed">{error}</p>
+          <div className="p-4 rounded-xl bg-[var(--color-danger-soft)] border border-[color:var(--color-danger)]/25 flex items-start gap-3">
+            <AlertCircle className="w-4 h-4 text-[var(--color-danger)] flex-shrink-0 mt-0.5" />
+            <p className="text-[var(--color-danger)] text-xs font-semibold leading-relaxed">{error}</p>
           </div>
         )}
 
@@ -195,13 +195,13 @@ export default function UploadPage() {
               type="text"
               {...register('fileName')}
               disabled={isSubmitting}
-              className={`form-input ${errors.fileName ? 'border-rose-500 focus:border-rose-500' : ''}`}
+              className={`form-input ${errors.fileName ? 'border-[color:var(--color-danger)] focus:border-[color:var(--color-danger)]' : ''}`}
               placeholder="e.g. Johnathan Vance - Senior Full Stack Engineer"
             />
             {errors.fileName ? (
-              <p className="mt-1.5 text-[11px] text-rose-400 font-medium">{errors.fileName.message}</p>
+              <p className="mt-1.5 text-[11px] text-[var(--color-danger)] font-medium">{errors.fileName.message}</p>
             ) : (
-              <p className="mt-1.5 text-[11px] text-zinc-500">This title will identify the resume throughout your workspace dashboard.</p>
+              <p className="mt-1.5 text-[11px] text-text-muted">This title will identify the resume throughout your workspace dashboard.</p>
             )}
           </div>
 
@@ -221,22 +221,22 @@ export default function UploadPage() {
             <div
               onDrop={handleDrop}
               onDragOver={(e) => e.preventDefault()}
-              className="mb-6 border-2 border-dashed border-[#22222a] hover:border-blue-500/50 rounded-2xl p-8 text-center bg-[#07070a] transition-all cursor-pointer group"
+              className="mb-6 border-2 border-dashed border-border-strong hover:border-accent/50 rounded-2xl p-8 text-center bg-raised transition-all cursor-pointer group"
             >
               {parsing ? (
                 <div className="flex flex-col items-center gap-3 py-4">
-                  <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
-                  <p className="text-xs font-bold text-zinc-200">Parsing PDF structural text...</p>
+                  <Loader2 className="w-8 h-8 text-[var(--color-accent-strong)] animate-spin" />
+                  <p className="text-xs font-bold text-text-primary">Parsing PDF structural text...</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center py-2">
-                  <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-colors mb-3">
+                  <div className="w-12 h-12 rounded-2xl bg-raised border border-border flex items-center justify-center text-text-muted group-hover:text-[var(--color-accent-strong)] group-hover:border-accent/35 transition-colors mb-3">
                     <UploadCloud className="w-6 h-6" />
                   </div>
-                  <p className="text-sm font-bold text-zinc-200 mb-1">
+                  <p className="text-sm font-bold text-text-primary mb-1">
                     Drag and drop resume file here, or browse
                   </p>
-                  <p className="text-xs text-zinc-500 mb-4">Supports standard PDF and plain text TXT documents</p>
+                  <p className="text-xs text-text-muted mb-4">Supports standard PDF and plain text TXT documents</p>
                   <label className="btn-secondary btn-sm cursor-pointer font-semibold">
                     Browse Computer Files
                     <input
@@ -251,9 +251,9 @@ export default function UploadPage() {
             </div>
 
             <div className="flex items-center gap-4 mb-4">
-              <div className="flex-1 h-px bg-[#1c1c21]" />
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">or inspect & edit raw text</span>
-              <div className="flex-1 h-px bg-[#1c1c21]" />
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">or inspect & edit raw text</span>
+              <div className="flex-1 h-px bg-border" />
             </div>
 
             <textarea
@@ -261,17 +261,17 @@ export default function UploadPage() {
               {...register('content')}
               disabled={isSubmitting}
               rows={10}
-              className={`form-input resize-y font-mono text-xs leading-relaxed bg-[#050508] ${errors.content ? 'border-rose-500 focus:border-rose-500' : ''}`}
+              className={`form-input resize-y font-mono text-xs leading-relaxed bg-raised ${errors.content ? 'border-[color:var(--color-danger)] focus:border-[color:var(--color-danger)]' : ''}`}
               placeholder="Paste raw candidate resume text here..."
             />
             {errors.content && (
-              <p className="mt-1.5 text-[11px] text-rose-400 font-medium">{errors.content.message}</p>
+              <p className="mt-1.5 text-[11px] text-[var(--color-danger)] font-medium">{errors.content.message}</p>
             )}
 
-            <div className="flex items-center justify-between mt-3 text-xs text-zinc-500 font-mono">
+            <div className="flex items-center justify-between mt-3 text-xs text-text-muted font-mono">
               <span>{contentValue.length} characters parsed</span>
               {isReady && (
-                <span className="text-emerald-400 font-bold flex items-center gap-1.5 font-sans">
+                <span className="text-[var(--color-success)] font-bold flex items-center gap-1.5 font-sans">
                   <CheckCircle2 className="w-4 h-4" /> Ready for AI Analysis
                 </span>
               )}
@@ -282,7 +282,7 @@ export default function UploadPage() {
             <button
               type="submit"
               disabled={isSubmitting || !isReady}
-              className="btn-primary py-3.5 px-8 text-xs font-bold shadow-xl shadow-blue-500/20 cursor-pointer disabled:opacity-50"
+              className="btn-primary py-3.5 px-8 text-xs font-bold shadow-xl shadow-accent/20 cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
