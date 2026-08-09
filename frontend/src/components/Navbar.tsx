@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Bell, Search, Command } from 'lucide-react';
+import { LogOut, Bell } from 'lucide-react';
 import { getUser, clearAuth } from '../lib/auth';
 
 export default function Navbar() {
