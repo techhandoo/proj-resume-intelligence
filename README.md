@@ -88,8 +88,32 @@ spring:
 Set the API key as an environment variable:
 
 ```bash
-export AI_API_KEY=your-api-key-here
+export AI_API_KEY=gsk_your-key-here
 ```
+
+> **Where to get the key:** In the [Groq console](https://console.groq.com/keys) the field is named **"API Key"** — create a key there and copy the `gsk_...` value. That value is what goes into the `AI_API_KEY` environment variable above (the env var name is a project convention; the console itself does not use the name `AI_API_KEY`).
+>
+> Without a key the app still works: analysis falls back to the built-in deterministic ATS engine and cover letters use the offline template generator, so uploads never hard-fail.
+
+---
+
+## Deploying the Backend (Render)
+
+Set these environment variables on the Render service (names are **exact** — the Groq key must be named `AI_API_KEY`, not anything else):
+
+| Variable | Value |
+| -------- | ----- |
+| `AI_API_KEY` | Your Groq key: `gsk_...` (create it at console.groq.com/keys — the console calls it "API Key"). `GROQ_API_KEY` is also accepted as a fallback name, so either works |
+| `JWT_SECRET` | A random string of 64+ characters |
+| `SPRING_DATASOURCE_URL` | A managed Postgres JDBC URL (e.g. Render Postgres) — **required in production**; the default H2 file DB resets on every deploy |
+| `SPRING_PROFILES_ACTIVE` | `prod` |
+
+Then configure the service:
+- **Build command:** `cd backend && ./mvnw -DskipTests package`
+- **Start command:** `java -jar target/*.jar`
+- **Health check path:** `/health` (returns HTTP 200 — the app has no Actuator, and the old `/` 404 breaks Render's health check)
+
+The AI call goes directly to `https://api.groq.com/openai/v1/chat/completions` with the `AI_API_KEY` value, so `AI_BASE_URL` is only needed if you point it at another OpenAI-compatible provider.
 
 ---
 

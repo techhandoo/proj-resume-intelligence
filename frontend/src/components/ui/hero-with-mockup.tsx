@@ -11,6 +11,7 @@ interface HeroWithMockupProps {
   primaryCta?: {
     text: string;
     href: string;
+    icon?: ReactNode;
   };
   secondaryCta?: {
     text: string;
@@ -94,7 +95,10 @@ export function HeroWithMockup({
                 'transition-all duration-300',
               )}
             >
-              <a href={primaryCta.href}>{primaryCta.text}</a>
+              <a href={primaryCta.href}>
+                {primaryCta.icon}
+                {primaryCta.text}
+              </a>
             </Button>
 
             <Button
