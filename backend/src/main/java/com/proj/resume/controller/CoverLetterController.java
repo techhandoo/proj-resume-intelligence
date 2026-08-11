@@ -69,7 +69,7 @@ public class CoverLetterController {
         }
 
         try {
-            String coverLetterMarkdown = aiAnalysisService.generateCoverLetter(rawText, request.getJobDescription());
+            String coverLetterMarkdown = aiAnalysisService.generateCoverLetter(rawText, request.getJobDescription(), request.getTone());
             return ResponseEntity.ok(new CoverLetterResponse(coverLetterMarkdown));
         } catch (Exception e) {
             log.error("Cover letter generation failed for resumeId={}: {}", resumeIdStr, e.getMessage(), e);

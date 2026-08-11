@@ -4,12 +4,21 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import * as pdfjsLib from 'pdfjs-dist';
+// Bundle the pdf.js worker with the app itself — the old CDN URL 404s or is
+// blocked on many networks, which made every PDF upload fail with a generic error.
+// Pinned to pdf.js 4.x: it feature-detects modern built-ins instead of requiring
+// them, so parsing works on older engines too (Chromium < 140).
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import AppLayout from '../components/AppLayout';
 import { UploadCloud, FileText, File, AlertCircle, Loader2, CheckCircle2, Zap, Sparkles } from 'lucide-react';
 import api from '../lib/api';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
+/**
+ * Extract text with layout awareness: honor explicit line breaks (hasEOL) and
+ * keep words on the same line separated by a single space.
+ */
 async function extractTextFromPDF(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -17,12 +26,19 @@ async function extractTextFromPDF(file: File): Promise<string> {
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    const pageText = content.items
-      .map((item: any) => item.str)
-      .join(' ');
-    fullText += pageText + '\n';
+    let pageText = '';
+    for (const item of content.items as any[]) {
+      pageText += item.hasEOL ? '\n' : (pageText.endsWith(' ') ? '' : ' ');
+      pageText += item.str;
+    }
+    fullText += pageText.replace(/\s{2,}/g, ' ').trim() + '\n';
   }
-  return fullText.trim();
+  const extracted = fullText.trim();
+  // A "text layer" that yields almost nothing usually means a scanned/image-only PDF.
+  if (extracted.length < 40) {
+    throw new Error('SCANNED_PDF');
+  }
+  return extracted;
 }
 
 const uploadSchema = z.object({
@@ -100,13 +116,14 @@ export default function UploadPage() {
       setParsing(true);
       try {
         const text = await extractTextFromPDF(file);
-        if (!text) {
-          setError('Could not extract text from this PDF. It may be scanned or image-only.');
+        setValue('content', text, { shouldValidate: true });
+      } catch (err: any) {
+        if (err?.message === 'SCANNED_PDF') {
+          setError('This PDF appears to be scanned or image-only — no text layer found. Please paste the resume text manually below.');
         } else {
-          setValue('content', text, { shouldValidate: true });
+          console.error('PDF parsing failed:', err);
+          setError('We could not parse this PDF. It may be corrupted or password-protected. Please paste the resume text manually below.');
         }
-      } catch {
-        setError('PDF parsing failed. Please paste the resume text manually below.');
       } finally {
         setParsing(false);
       }

@@ -21,11 +21,11 @@ function AnimatedRoutes() {
         <Route path="/"          element={<LandingPage />} />
         <Route path="/login"     element={<LoginPage />}   />
         <Route path="/register"  element={<RegisterPage />} />
+        <Route path="/about"     element={<AboutPage />} />
 
         {/* Protected routes */}
         <Route path="/dashboard"    element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/upload"       element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
-        <Route path="/about"        element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
         <Route path="/resumes/:id"  element={<ProtectedRoute><ResumeDetailPage /></ProtectedRoute>} />
         <Route path="/cover-letter" element={<ProtectedRoute><CoverLetterPage /></ProtectedRoute>} />
         <Route path="/templates"    element={<ProtectedRoute><TemplatesPage /></ProtectedRoute>} />

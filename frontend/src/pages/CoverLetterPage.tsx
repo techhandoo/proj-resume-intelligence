@@ -56,7 +56,8 @@ export default function CoverLetterPage() {
     try {
       const response = await api.post('/cover-letter/generate', {
         resumeId: selectedResumeId,
-        jobDescription: `Tone: ${selectedTone}\n\n${jobDescription}`,
+        jobDescription,
+        tone: selectedTone,
       });
       setCoverLetter(response.data.coverLetterMarkdown);
     } catch (err: any) {

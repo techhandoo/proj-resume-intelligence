@@ -6,4 +6,5 @@ import lombok.Data;
 public class CoverLetterRequest {
     private String resumeId;
     private String jobDescription;
+    private String tone; // professional | executive | technical | creative
 }

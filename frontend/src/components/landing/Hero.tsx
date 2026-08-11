@@ -1,9 +1,8 @@
 import { motion } from 'framer-motion';
-import { ShieldCheck, Cpu, Award, FileText, BookOpen } from 'lucide-react';
+import { ShieldCheck, Cpu, Award, FileText, BookOpen, LayoutDashboard } from 'lucide-react';
 import { HeroWithMockup } from '../ui/hero-with-mockup';
 import { DashboardMockup } from '../ui/dashboard-mockup';
-
-const companies = ['Northwind Labs', 'Vertex Systems', 'Brightpath HR', 'Cobalt & Co', 'Lumen Group'];
+import { isAuthenticated } from '../../lib/auth';
 
 const metrics = [
   { label: 'Parsing Accuracy', value: '99.4%', icon: ShieldCheck },
@@ -13,6 +12,8 @@ const metrics = [
 ];
 
 export default function LandingHero() {
+  const authenticated = isAuthenticated();
+
   return (
     <div className="relative">
       <HeroWithMockup
@@ -25,7 +26,11 @@ export default function LandingHero() {
           </>
         }
         description="Analyze, categorize, and evaluate candidate resumes at scale. Extract technical skill matrices, ATS score compatibility, and automated cover letters in seconds."
-        primaryCta={{ text: 'Start Free Trial', href: '/register' }}
+        primaryCta={
+          authenticated
+            ? { text: 'Open Your Dashboard', href: '/dashboard', icon: <LayoutDashboard className="mr-2 h-4 w-4" /> }
+            : { text: 'Start Free Trial', href: '/register' }
+        }
         secondaryCta={{
           text: 'Explore Architecture',
           href: '/about',
@@ -33,25 +38,6 @@ export default function LandingHero() {
         }}
         mockup={<DashboardMockup className="w-full h-auto" />}
       />
-
-      {/* Trust bar */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7, duration: 0.6 }}
-        className="mx-auto w-full max-w-7xl px-6 sm:px-10"
-      >
-        <p className="text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-subtle)]">
-          Trusted by recruiting teams at
-        </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
-          {companies.map((c) => (
-            <span key={c} className="text-sm font-bold tracking-tight text-[var(--color-text-muted)]/70 select-none">
-              {c}
-            </span>
-          ))}
-        </div>
-      </motion.div>
 
       {/* Metrics bar */}
       <motion.div

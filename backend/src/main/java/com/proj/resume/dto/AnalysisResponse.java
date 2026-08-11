@@ -22,6 +22,9 @@ public class AnalysisResponse {
     private Integer experienceYears;
     private String education;
     private String recommendations;
+    private Integer atsScore;
+    private List<String> insights;
+    private List<String> improvements;
     private LocalDateTime analyzedAt;
 
     public static AnalysisResponse from(Analysis analysis) {
@@ -37,6 +40,9 @@ public class AnalysisResponse {
                 .experienceYears(analysis.getExperienceYears())
                 .education(analysis.getEducation())
                 .recommendations(analysis.getRecommendations())
+                .atsScore(analysis.getAtsScore())
+                .insights(analysis.getInsights())
+                .improvements(analysis.getImprovements())
                 .analyzedAt(analysis.getAnalyzedAt())
                 .build();
     }
