@@ -3,9 +3,6 @@ import { useSearchParams, Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import { Target, Mail, PenTool, Loader2, Download, FileText, ChevronRight, Copy, Check, SlidersHorizontal, Sparkles } from 'lucide-react';
 import api from '../lib/api';
-import html2pdf from 'html2pdf.js';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
-import { saveAs } from 'file-saver';
 
 const TONES = [
   { id: 'professional', label: 'Professional & Polished' },
@@ -70,9 +67,10 @@ export default function CoverLetterPage() {
     }
   };
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     const element = document.getElementById('cover-letter-content');
     if (!element) return;
+    const { default: html2pdf } = await import('html2pdf.js');
     html2pdf().set({
       margin: 0.75,
       filename: 'Resumify_Cover_Letter.pdf',
@@ -84,6 +82,8 @@ export default function CoverLetterPage() {
 
   const exportWord = async () => {
     if (!coverLetter) return;
+    const { Document, Packer, Paragraph, TextRun } = await import('docx');
+    const { saveAs } = await import('file-saver');
     const paragraphs = coverLetter.split('\n').map(line =>
       new Paragraph({ children: [new TextRun(line)] })
     );
