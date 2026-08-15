@@ -58,7 +58,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        // Public liveness + diagnostics: uptime monitors (UptimeRobot), Render health
+                        // checks, and AI config verification must work WITHOUT a JWT.
+                        .requestMatchers("/api/v1/ai/status").permitAll()
+                        .requestMatchers("/health", "/", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

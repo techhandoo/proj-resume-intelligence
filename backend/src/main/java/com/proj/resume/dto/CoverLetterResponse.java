@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CoverLetterResponse {
     private String coverLetterMarkdown;
+    private String source; // "groq" | "heuristic"
 }

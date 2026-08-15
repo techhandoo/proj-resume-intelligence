@@ -23,6 +23,7 @@ export default function CoverLetterPage() {
   const [selectedTone, setSelectedTone] = useState('professional');
   const [jobDescription, setJobDescription] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
+  const [coverLetterSource, setCoverLetterSource] = useState(''); // 'groq' | 'heuristic'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
@@ -60,6 +61,7 @@ export default function CoverLetterPage() {
         tone: selectedTone,
       });
       setCoverLetter(response.data.coverLetterMarkdown);
+      setCoverLetterSource(response.data.source || '');
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || 'An unexpected error occurred.';
       setError('Failed to generate cover letter: ' + msg);
@@ -237,6 +239,13 @@ export default function CoverLetterPage() {
                 </div>
               )}
             </div>
+
+            {/* Heuristic fallback notice */}
+            {coverLetter && coverLetterSource === 'heuristic' && (
+              <p className="text-[11px] font-semibold text-[var(--color-warning)] mb-3 rounded-xl bg-[var(--color-warning-soft)] border border-[color:var(--color-warning)]/20 px-3 py-2">
+                Groq AI was unavailable, so this letter was drafted by the built-in template engine from your resume and job description.
+              </p>
+            )}
 
             {/* Document Sheet Box */}
             <div className="flex-1 bg-raised border border-border rounded-2xl p-6 sm:p-8 overflow-y-auto max-h-[500px] shadow-inner">

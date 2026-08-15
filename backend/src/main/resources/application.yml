@@ -34,10 +34,14 @@ spring:
     openai:
       # Canonical name is AI_API_KEY; GROQ_API_KEY is accepted as a fallback.
       api-key: ${AI_API_KEY:${GROQ_API_KEY:YOUR_GROQ_API_KEY_HERE}}
+      # Do NOT include /v1 here — the client appends it (e.g. https://openrouter.ai/api).
       base-url: ${AI_BASE_URL:https://api.groq.com/openai}
       chat:
         options:
-          model: ${AI_MODEL:llama-3.3-70b-versatile}
+          # llama-3.3-70b-versatile was deprecated by Groq (shutdown 08/16/2026) and returns
+          # errors, which silently dropped every call into the heuristic fallback. gpt-oss-120b
+          # supports Structured Outputs (strict JSON), keeping the analysis truly resume-specific.
+          model: ${AI_MODEL:openai/gpt-oss-120b}
           temperature: 0.3
 
 # ── JWT ────────────────────────────────────────────────────
@@ -45,6 +49,18 @@ app:
   jwt:
     secret: ${JWT_SECRET:YOUR_LOCAL_DEV_JWT_SECRET_STRING_AT_LEAST_64_CHARACTERS_LONG}
     expiration-ms: 86400000  # 24 hours
+
+  # ── Keep-alive (uptime) ────────────────────────────────────
+  # Pings every URL in app.keepalive.urls on a fixed delay so hosted instances
+  # (Render free tier, container hosts) don't spin down after idle. Also add the
+  # backend's own public URL (e.g. https://your-backend.onrender.com/health) so the
+  # keep-alive covers both the frontend and the API.
+  keepalive:
+    enabled: ${KEEP_ALIVE_ENABLED:true}
+    interval-ms: ${KEEP_ALIVE_INTERVAL_MS:240000}   # 4 minutes — safely under Render's 15-min idle timeout
+    initial-delay-ms: ${KEEP_ALIVE_INITIAL_DELAY_MS:60000}
+    timeout-ms: ${KEEP_ALIVE_TIMEOUT_MS:10000}
+    urls: ${KEEP_ALIVE_URLS:https://proj-resume-intelligence.vercel.app,https://proj-resume-intelligence.onrender.com/health}
 
 # ── Logging ────────────────────────────────────────────────
 logging:

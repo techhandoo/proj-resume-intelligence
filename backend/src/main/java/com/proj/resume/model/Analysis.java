@@ -52,6 +52,10 @@ public class Analysis {
     @Column(name = "analyzed_at", nullable = false, updatable = false)
     private LocalDateTime analyzedAt;
 
+    /** Provenance: "groq" when the LLM produced the analysis, "heuristic" when the deterministic engine did. */
+    @Column(length = 32)
+    private String source;
+
     @PrePersist
     protected void onCreate() {
         analyzedAt = LocalDateTime.now();

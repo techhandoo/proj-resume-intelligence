@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proj.resume.model.Analysis;
 import com.proj.resume.model.Resume;
 import com.proj.resume.repository.AnalysisRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,8 +35,89 @@ public class AIAnalysisService {
     @Value("${spring.ai.openai.api-key:}")
     private String apiKey;
 
-    @Value("${spring.ai.openai.chat.options.model:llama-3.3-70b-versatile}")
+    @Value("${spring.ai.openai.chat.options.model:openai/gpt-oss-120b}")
     private String model;
+
+    @Value("${spring.ai.openai.base-url:https://api.groq.com/openai}")
+    private String baseUrl;
+
+    /** Provenance of the produced analysis — lets the UI tell LLM output from the deterministic engine. */
+    public static final String SOURCE_AI = "groq";
+    public static final String SOURCE_HEURISTIC = "heuristic";
+
+    /**
+     * Strict JSON Schema for the analysis output. Groq supports constrained decoding
+     * (response_format json_schema, strict: true) on openai/gpt-oss-* models, which
+     * guarantees schema-valid JSON so the resume-specific fields always parse.
+     */
+    private static final Map<String, Object> ANALYSIS_STRICT_SCHEMA = Map.of(
+            "type", "object",
+            "properties", Map.of(
+                    "summary", Map.of("type", "string"),
+                    "skills", Map.of("type", "string"),
+                    "experienceYears", Map.of("type", "integer"),
+                    "education", Map.of("type", "string"),
+                    "atsScore", Map.of("type", "integer"),
+                    "insights", Map.of("type", "array", "items", Map.of("type", "string")),
+                    "improvements", Map.of("type", "array", "items", Map.of("type", "string")),
+                    "recommendations", Map.of("type", "string")
+            ),
+            "required", List.of("summary", "skills", "experienceYears", "education", "atsScore", "insights", "improvements", "recommendations"),
+            "additionalProperties", false
+    );
+
+    @PostConstruct
+    public void logAiConfiguration() {
+        if (isAiConfigured()) {
+            log.info("Groq AI configured — model: {}, chat completions endpoint: {}", model, resolveChatCompletionsUrl());
+        } else {
+            log.warn("Groq AI NOT configured: AI_API_KEY / GROQ_API_KEY is missing or still the placeholder. "
+                    + "Resume analysis and cover letters will fall back to the built-in deterministic engines "
+                    + "and the Groq console will show 0 tokens used. Set AI_API_KEY on the backend host and redeploy.");
+        }
+    }
+
+    public boolean isAiConfigured() {
+        String cleanKey = apiKey != null ? apiKey.trim() : "";
+        return !cleanKey.isBlank() && !cleanKey.equalsIgnoreCase("YOUR_GROQ_API_KEY_HERE");
+    }
+
+    /** Public diagnostics — never exposes the key itself. */
+    public Map<String, Object> getConfigStatus() {
+        Map<String, Object> status = new LinkedHashMap<>();
+        status.put("configured", isAiConfigured());
+        status.put("model", model);
+        status.put("baseUrl", baseUrl);
+        status.put("chatCompletionsUrl", resolveChatCompletionsUrl());
+        return status;
+    }
+
+    private void validateAiConfig() {
+        if (!isAiConfigured()) {
+            throw new IllegalStateException("Groq API key is not configured. Set the AI_API_KEY (or GROQ_API_KEY) environment variable on the backend and redeploy.");
+        }
+    }
+
+    private String resolveChatCompletionsUrl() {
+        String base = (baseUrl == null || baseUrl.isBlank()) ? "https://api.groq.com/openai" : baseUrl.trim();
+        return base.replaceAll("/+$", "") + "/v1/chat/completions";
+    }
+
+    private static Map<String, Object> strictAnalysisFormat() {
+        return Map.of(
+                "type", "json_schema",
+                "json_schema", Map.of(
+                        "name", "resume_analysis",
+                        "strict", true,
+                        "schema", ANALYSIS_STRICT_SCHEMA
+                )
+        );
+    }
+
+    private static String truncate(String s) {
+        if (s == null) return "";
+        return s.length() <= 500 ? s : s.substring(0, 500) + "...";
+    }
 
     /** System message: role, task, rubric, schema — never mixed with candidate data. */
     private static final String ANALYSIS_SYSTEM_PROMPT = """
@@ -107,56 +189,29 @@ public class AIAnalysisService {
     }
 
     private String callGroqApi(String systemPrompt, String userPrompt) {
-        String url = "https://api.groq.com/openai/v1/chat/completions";
+        validateAiConfig();
 
-        String cleanKey = apiKey != null ? apiKey.trim() : "";
-        if (cleanKey.isBlank() || cleanKey.equalsIgnoreCase("YOUR_GROQ_API_KEY_HERE")) {
-            throw new IllegalStateException("Groq API key is not configured.");
-        }
+        List<Map<String, String>> messages = List.of(
+                Map.of("role", "system", "content", systemPrompt),
+                Map.of("role", "user", "content", userPrompt));
 
-        log.info("Calling Groq API at {} with model: {}", url, model);
+        log.info("Calling Groq API at {} with model: {}", resolveChatCompletionsUrl(), model);
 
         try {
-            Map<String, Object> requestMap = new java.util.HashMap<>();
-            requestMap.put("model", model);
-            requestMap.put("messages", List.of(
-                    Map.of("role", "system", "content", systemPrompt),
-                    Map.of("role", "user", "content", userPrompt)));
-            requestMap.put("temperature", 0.3);
-            requestMap.put("max_tokens", 1200);
-            requestMap.put("response_format", Map.of("type", "json_object"));
-            String jsonPayload = objectMapper.writeValueAsString(requestMap);
+            // Primary: constrained decoding (Structured Outputs) on openai/gpt-oss-* models.
+            HttpResponse<String> response = postChatCompletion(messages, 0.3, 2000, strictAnalysisFormat());
 
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
-                }
-            };
-
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustAllCerts, new SecureRandom());
-
-            HttpClient client = HttpClient.newBuilder()
-                    .sslContext(sslContext)
-                    .connectTimeout(java.time.Duration.ofSeconds(10))
-                    .build();
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Authorization", "Bearer " + cleanKey)
-                    .header("Content-Type", "application/json")
-                    .timeout(java.time.Duration.ofSeconds(30))
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            // Fallback: models that don't support strict json_schema reject it with 400 — retry in JSON object mode.
+            if (response.statusCode() == 400) {
+                log.warn("Groq rejected strict structured output (HTTP 400) — retrying with JSON object mode. Body: {}",
+                        truncate(response.body()));
+                response = postChatCompletion(messages, 0.3, 2000, Map.of("type", "json_object"));
+            }
 
             log.info("Groq API Response Status: {}", response.statusCode());
 
             if (response.statusCode() >= 400) {
-                throw new RuntimeException("Groq API returned HTTP " + response.statusCode() + ": " + response.body());
+                throw new RuntimeException("Groq API returned HTTP " + response.statusCode() + ": " + truncate(response.body()));
             }
 
             JsonNode root = objectMapper.readTree(response.body());
@@ -167,10 +222,58 @@ public class AIAnalysisService {
 
             return choices.get(0).path("message").path("content").asText();
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Groq API call error: {}", e.getMessage());
             throw new RuntimeException("Groq API call failed: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Shared transport for Groq / OpenAI-compatible chat completions. Returns the raw
+     * response so callers can decide how to handle 4xx/5xx (e.g. retry with a weaker
+     * response_format). Throws only on transport-level failures.
+     */
+    private HttpResponse<String> postChatCompletion(List<Map<String, String>> messages,
+                                                     double temperature,
+                                                     int maxTokens,
+                                                     Map<String, Object> responseFormat) throws Exception {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("model", model);
+        requestMap.put("messages", messages);
+        requestMap.put("temperature", temperature);
+        requestMap.put("max_tokens", maxTokens);
+        if (responseFormat != null) {
+            requestMap.put("response_format", responseFormat);
+        }
+        String jsonPayload = objectMapper.writeValueAsString(requestMap);
+
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+            }
+        };
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, trustAllCerts, new SecureRandom());
+
+        HttpClient client = HttpClient.newBuilder()
+                .sslContext(sslContext)
+                .connectTimeout(java.time.Duration.ofSeconds(10))
+                .build();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(resolveChatCompletionsUrl()))
+                .header("Authorization", "Bearer " + apiKey.trim())
+                .header("Content-Type", "application/json")
+                .timeout(java.time.Duration.ofSeconds(60))
+                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private Analysis parseAnalysisResponse(String content, Resume resume) {
@@ -184,10 +287,12 @@ public class AIAnalysisService {
         Integer atsScore = null;
         List<String> insights = new ArrayList<>();
         List<String> improvements = new ArrayList<>();
+        boolean aiParsed = false;
 
         if (content != null && !content.isBlank()) {
             try {
                 JsonNode root = objectMapper.readTree(content);
+                aiParsed = root.hasNonNull("summary") || root.hasNonNull("atsScore") || root.has("insights");
                 summary = root.path("summary").asText(null);
                 skills = root.path("skills").asText(null);
                 education = root.path("education").asText(null);
@@ -258,6 +363,7 @@ public class AIAnalysisService {
                 .atsScore(atsScore)
                 .insights(insights)
                 .improvements(improvements)
+                .source(aiParsed ? SOURCE_AI : SOURCE_HEURISTIC)
                 .build();
     }
 
@@ -544,17 +650,22 @@ public class AIAnalysisService {
             ---
             """;
 
-    public String generateCoverLetter(String resumeText, String jobDescription, String tone) {
+    public CoverLetterResult generateCoverLetter(String resumeText, String jobDescription, String tone) {
         String toneLabel = (tone == null || tone.isBlank()) ? "professional" : tone.trim();
         String user = String.format(COVER_LETTER_USER_PROMPT, toneLabel, jobDescription, resumeText);
 
         try {
-            return callGroqApiTextOnly(COVER_LETTER_SYSTEM_PROMPT, user);
+            String markdown = callGroqApiTextOnly(COVER_LETTER_SYSTEM_PROMPT, user);
+            return new CoverLetterResult(markdown, SOURCE_AI);
         } catch (Exception e) {
             log.warn("Groq cover letter generation failed ({}). Using deterministic resume+JD fallback.", e.getMessage());
-            return generateFallbackCoverLetter(resumeText, jobDescription, toneLabel);
+            return new CoverLetterResult(generateFallbackCoverLetter(resumeText, jobDescription, toneLabel), SOURCE_HEURISTIC);
         }
     }
+
+    /** Cover letter plus its provenance, so the UI can flag heuristic output. */
+    public record CoverLetterResult(String markdown, String source) {}
+
 
     /**
      * Deterministic cover letter builder — always works, and always derives its
@@ -671,51 +782,22 @@ public class AIAnalysisService {
     }
     
     private String callGroqApiTextOnly(String systemPrompt, String userPrompt) throws Exception {
-        String url = "https://api.groq.com/openai/v1/chat/completions";
-        String cleanKey = apiKey != null ? apiKey.trim() : "";
-        if (cleanKey.isBlank() || cleanKey.equalsIgnoreCase("YOUR_GROQ_API_KEY_HERE")) {
-            throw new IllegalStateException("Groq API key is not configured.");
-        }
+        validateAiConfig();
 
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("model", model);
-        requestMap.put("messages", List.of(
+        List<Map<String, String>> messages = List.of(
                 Map.of("role", "system", "content", systemPrompt),
-                Map.of("role", "user", "content", userPrompt)));
-        requestMap.put("temperature", 0.7);
-        requestMap.put("max_tokens", 1024);
+                Map.of("role", "user", "content", userPrompt));
 
-        String jsonPayload = objectMapper.writeValueAsString(requestMap);
-
-        TrustManager[] trustAllCerts = new TrustManager[]{
-            new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
-            }
-        };
-
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, trustAllCerts, new SecureRandom());
-        HttpClient client = HttpClient.newBuilder()
-                .sslContext(sslContext)
-                .connectTimeout(java.time.Duration.ofSeconds(10))
-                .build();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Authorization", "Bearer " + cleanKey)
-                .header("Content-Type", "application/json")
-                .timeout(java.time.Duration.ofSeconds(30))
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = postChatCompletion(messages, 0.7, 1024, null);
         if (response.statusCode() >= 400) {
-            throw new RuntimeException("Groq API returned HTTP " + response.statusCode());
+            throw new RuntimeException("Groq API returned HTTP " + response.statusCode() + ": " + truncate(response.body()));
         }
 
         JsonNode root = objectMapper.readTree(response.body());
-        return root.path("choices").get(0).path("message").path("content").asText();
+        JsonNode choices = root.path("choices");
+        if (!choices.isArray() || choices.isEmpty()) {
+            throw new IllegalStateException("No choices in Groq response");
+        }
+        return choices.get(0).path("message").path("content").asText();
     }
 }
