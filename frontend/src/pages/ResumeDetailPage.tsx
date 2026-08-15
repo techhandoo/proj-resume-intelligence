@@ -26,6 +26,7 @@ interface AnalysisDetail {
   insights?: string[];
   improvements?: string[];
   analyzedAt: string;
+  source?: string; // 'groq' | 'heuristic'
 }
 
 const statusConfig: Record<string, { label: string; badgeClass: string }> = {
@@ -297,9 +298,19 @@ export default function ResumeDetailPage() {
                 {/* Summary & Key Metrics Card */}
                 <div className="glass-card p-6 lg:col-span-2 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-2 mb-4 flex-wrap">
                       <CheckCircle2 className="w-4 h-4 text-[var(--color-success)]" />
                       <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider">Candidate Executive Summary</h2>
+                      {analysis.source && (
+                        <span
+                          className={`badge ${analysis.source === 'groq' ? 'badge-emerald' : 'badge-amber'}`}
+                          title={analysis.source === 'groq'
+                            ? 'Produced by the Groq LLM from this resume\'s text'
+                            : 'Groq was unavailable — produced by the built-in deterministic engine from this resume\'s text'}
+                        >
+                          {analysis.source === 'groq' ? 'Groq AI Analysis' : 'Heuristic Fallback'}
+                        </span>
+                      )}
                     </div>
 
                     <p className="text-text-secondary text-xs sm:text-sm leading-relaxed mb-6 border-l-2 border-[color:var(--color-success)]/45 pl-4 py-1">

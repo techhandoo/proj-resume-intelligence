@@ -26,6 +26,7 @@ public class AnalysisResponse {
     private List<String> insights;
     private List<String> improvements;
     private LocalDateTime analyzedAt;
+    private String source;
 
     public static AnalysisResponse from(Analysis analysis) {
         List<String> skillsList = analysis.getSkills() != null
@@ -44,6 +45,7 @@ public class AnalysisResponse {
                 .insights(analysis.getInsights())
                 .improvements(analysis.getImprovements())
                 .analyzedAt(analysis.getAnalyzedAt())
+                .source(analysis.getSource())
                 .build();
     }
 }
