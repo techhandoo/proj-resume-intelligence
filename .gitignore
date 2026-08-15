@@ -43,6 +43,10 @@ frontend/dist-ssr/
 node_modules/
 dist/
 
+# Agent / Coding-Tooling Files (not part of the app)
+.agents/
+skills-lock.json
+
 # Temporary Files
 *.tmp
 *.bak
