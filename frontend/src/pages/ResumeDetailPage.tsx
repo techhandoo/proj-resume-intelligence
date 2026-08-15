@@ -395,10 +395,13 @@ export default function ResumeDetailPage() {
                   <div className="relative w-64">
                     <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
                     <input 
+                      id="skill-filter"
+                      name="skill-filter"
                       type="text" 
                       placeholder="Filter skills..." 
                       value={skillSearch}
                       onChange={(e) => setSkillSearch(e.target.value)}
+                      aria-label="Filter skills"
                       className="form-input py-1.5 pl-9 text-xs bg-raised"
                     />
                   </div>

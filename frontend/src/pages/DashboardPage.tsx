@@ -230,6 +230,8 @@ export default function DashboardPage() {
                   <div className="relative flex-1 sm:w-56">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--color-text-subtle)]" />
                     <input
+                      id="resume-search"
+                      name="resume-search"
                       type="text"
                       placeholder="Search title or ID…"
                       value={searchQuery}
@@ -240,6 +242,8 @@ export default function DashboardPage() {
                   </div>
 
                   <select
+                    id="status-filter"
+                    name="status-filter"
                     value={selectedStatusFilter}
                     onChange={(e) => setSelectedStatusFilter(e.target.value)}
                     aria-label="Filter by status"

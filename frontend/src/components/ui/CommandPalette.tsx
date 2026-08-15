@@ -101,8 +101,11 @@ export default function CommandPalette() {
             <div className="flex items-center gap-3 border-b border-border px-4">
               <Search className="w-4 h-4 flex-shrink-0 text-[var(--color-text-muted)]" />
               <input
+                id="command-palette-input"
+                name="command-search"
                 ref={inputRef}
                 value={query}
+                aria-label="Command palette search"
                 onChange={(e) => { setQuery(e.target.value); setSelected(0); }}
                 onKeyDown={(e) => {
                   if (e.key === 'ArrowDown') { e.preventDefault(); setSelected((s) => Math.min(s + 1, filtered.length - 1)); }

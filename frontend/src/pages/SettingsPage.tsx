@@ -92,12 +92,12 @@ export default function SettingsPage() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="form-label">Display Name</label>
-                    <input type="text" defaultValue={user?.fullName || ''} className="form-input text-xs" />
+                    <label htmlFor="profileName" className="form-label">Display Name</label>
+                    <input id="profileName" name="profileName" type="text" defaultValue={user?.fullName || ''} className="form-input text-xs" />
                   </div>
                   <div>
-                    <label className="form-label">Email Address</label>
-                    <input type="email" defaultValue={user?.email || ''} className="form-input text-xs" disabled />
+                    <label htmlFor="profileEmail" className="form-label">Email Address</label>
+                    <input id="profileEmail" name="profileEmail" type="email" defaultValue={user?.email || ''} className="form-input text-xs" disabled />
                   </div>
                   <div className="pt-2">
                     <button className="btn-primary py-2.5 px-5 text-xs font-bold shadow-md shadow-accent/20">
@@ -128,18 +128,18 @@ export default function SettingsPage() {
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">
                   <div>
-                    <label className="form-label">Current Password</label>
-                    <input type="password" {...register('currentPassword')} className="form-input text-xs" placeholder="••••••••••••" />
+                    <label htmlFor="currentPassword" className="form-label">Current Password</label>
+                    <input id="currentPassword" type="password" {...register('currentPassword')} className="form-input text-xs" placeholder="••••••••••••" />
                     {errors.currentPassword && <span className="text-[11px] text-[var(--color-danger)] font-semibold mt-1 block">{errors.currentPassword.message as string}</span>}
                   </div>
                   <div>
-                    <label className="form-label">New Password</label>
-                    <input type="password" {...register('newPassword')} className="form-input text-xs" placeholder="••••••••••••" />
+                    <label htmlFor="newPassword" className="form-label">New Password</label>
+                    <input id="newPassword" type="password" {...register('newPassword')} className="form-input text-xs" placeholder="••••••••••••" />
                     {errors.newPassword && <span className="text-[11px] text-[var(--color-danger)] font-semibold mt-1 block">{errors.newPassword.message as string}</span>}
                   </div>
                   <div>
-                    <label className="form-label">Confirm New Password</label>
-                    <input type="password" {...register('confirmPassword')} className="form-input text-xs" placeholder="••••••••••••" />
+                    <label htmlFor="confirmPassword" className="form-label">Confirm New Password</label>
+                    <input id="confirmPassword" type="password" {...register('confirmPassword')} className="form-input text-xs" placeholder="••••••••••••" />
                     {errors.confirmPassword && <span className="text-[11px] text-[var(--color-danger)] font-semibold mt-1 block">{errors.confirmPassword.message as string}</span>}
                   </div>
                   <div className="pt-2">
