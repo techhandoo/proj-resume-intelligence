@@ -93,7 +93,9 @@ public class SecurityConfig {
         // https://*.vercel.app while still echoing the exact origin + credentials.
         config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        // X-Request-Id is sent by the frontend on every request (correlation IDs); it MUST be
+        // listed or the browser rejects the preflight. Keep this list in sync with api.ts.
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Request-Id", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
         config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
