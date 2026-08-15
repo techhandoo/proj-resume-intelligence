@@ -98,6 +98,16 @@ export AI_API_KEY=gsk_your-key-here
 > Without a key the app still works: analysis falls back to the built-in deterministic ATS engine and cover letters use the offline template generator, so uploads never hard-fail. To tell which engine produced a result, check the `source` field in the API response (`"groq"` vs `"heuristic"`) — the UI shows a badge for it.
 >
 > **Diagnose "0 tokens used":** hit `GET https://<backend>/api/v1/ai/status` (public, no auth). If it returns `{"configured": false}`, the `AI_API_KEY`/`GROQ_API_KEY` environment variable is missing or is still the placeholder on the backend host — set it and redeploy.
+>
+> See `.env.example` (root + `frontend/`) for the full set of environment variables the app needs.
+
+### Async analysis
+
+Uploads no longer block on the LLM: `POST /api/v1/resumes` saves the resume, enqueues an `analysis_jobs` row, and returns immediately with status `PROCESSING`. A background worker (`AnalysisWorker`) drains the queue, runs the Groq analysis, retries up to 3 times, and the frontend polls the resume until it becomes `ANALYZED` or `FAILED`. A reaper recovers jobs left `PROCESSING` after a crash. Tune with `ANALYSIS_POLL_INTERVAL_MS` / `ANALYSIS_REAPER_INTERVAL_MS`.
+
+### Schema migrations (Flyway)
+
+Flyway is now **enabled**. Existing databases (previously managed by `ddl-auto`) are automatically baselined at V4 on first boot; V5/V6 are idempotent (`ADD COLUMN IF NOT EXISTS` / `CREATE TABLE IF NOT EXISTS`), so both fresh and existing databases converge on the same schema. `ddl-auto` remains `update` as a safety net.
 
 ---
 
@@ -121,6 +131,12 @@ Optional:
 | `KEEP_ALIVE_URLS` | Comma-separated URLs the backend pings every 4 minutes (default: the Vercel frontend + the backend's own `/health`). Add your Render URL if it differs |
 | `KEEP_ALIVE_ENABLED` | `true`/`false` (default `true`) |
 | `KEEP_ALIVE_INTERVAL_MS` | Ping interval in ms (default `240000` = 4 min) |
+| `APP_CORS_ALLOWED_ORIGINS` | Allowed origins, comma-separated, wildcards allowed (default `https://*.vercel.app,http://localhost:5173,http://localhost:3000` — covers all Vercel preview deployments) |
+| `ANALYSIS_POLL_INTERVAL_MS` | Worker claim interval (default `3000`) |
+| `ANALYSIS_REAPER_INTERVAL_MS` | Stale-job recovery interval (default `60000`) |
+| `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | Postgres credentials (required with `SPRING_DATASOURCE_URL`) |
+
+> **Security hardening included:** TLS verification is now enforced for the Groq call (the old trust-all `SSLContext` is gone); `/api/v1/auth/login` and `/register` are rate-limited per IP (10/5min and 5/5min, in-memory — move to Redis/a WAF if you scale beyond one instance); every response carries an `X-Request-Id` correlation header echoed in the backend logs; and Spring Boot Actuator exposes `/actuator/health` + `/actuator/metrics`.
 
 Then configure the service:
 - **Build command:** `cd backend && ./mvnw -DskipTests package`
@@ -128,6 +144,16 @@ Then configure the service:
 - **Health check path:** `/health` (returns HTTP 200 — the app has no Actuator, and the old `/` 404 breaks Render's health check). `/health` is now public, so health checks and uptime monitors no longer get 401.
 
 The AI call goes to `{AI_BASE_URL}/v1/chat/completions` (default `https://api.groq.com/openai/v1/chat/completions`) with the `AI_API_KEY` value, so `AI_BASE_URL` is only needed if you point it at another OpenAI-compatible provider.
+
+## Local development
+
+`docker compose up` now runs PostgreSQL + RabbitMQ **and the backend** (builds `backend/Dockerfile`, starts on `:8080`). For the frontend: `cd frontend && npm install && npm run dev` (proxies `/api` to `:8080`).
+
+## Tests & CI
+
+- Backend: `cd backend && ./mvnw verify` — unit tests cover the AI fallback engine, the async job worker (success/retry/fail), the upload hand-off, and the auth rate limiter.
+- Frontend: `npm run build` (typecheck + bundle) and `npm run lint`.
+- CI (GitHub Actions) runs backend `verify`, frontend build+lint, and a gitleaks secret scan on every push/PR.
 
 ## Keeping the backend awake (free-tier sleep)
 
