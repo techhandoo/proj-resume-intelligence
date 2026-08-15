@@ -149,18 +149,24 @@ export default function TemplatesPage() {
             <div className="relative w-full md:w-72">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
               <input
+                id="template-search"
+                name="template-search"
                 type="text"
                 placeholder="Search templates..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search templates"
                 className="form-input py-2.5 pl-10 text-xs bg-raised"
               />
             </div>
             <div className="relative">
               <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
               <select
+                id="template-sort"
+                name="template-sort"
                 value={sortKey}
                 onChange={(e) => setSortKey(e.target.value as SortKey)}
+                aria-label="Sort templates"
                 className="form-input py-2.5 pl-9 pr-8 text-xs bg-raised cursor-pointer appearance-none"
               >
                 {SORT_OPTIONS.map((opt) => (

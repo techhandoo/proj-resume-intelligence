@@ -257,6 +257,8 @@ export default function UploadPage() {
                   <label className="btn-secondary btn-sm cursor-pointer font-semibold">
                     Browse Computer Files
                     <input
+                      id="resume-file"
+                      name="resume-file"
                       type="file"
                       accept=".pdf,.txt,.text"
                       onChange={handleFileSelect}
