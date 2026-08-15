@@ -19,8 +19,14 @@ spring:
     show-sql: false
 
   # ── Flyway Migrations ────────────────────────────────────
+  # Enabled so schema changes are versioned and reproducible. Existing databases
+  # (created earlier by ddl-auto) are baselined at V4; V5/V6 are idempotent
+  # (ADD COLUMN IF NOT EXISTS / CREATE TABLE IF NOT EXISTS), so they apply cleanly
+  # to both baselined and fresh databases.
   flyway:
-    enabled: false
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 4
 
   # ── RabbitMQ ──────────────────────────────────────────────
   rabbitmq:
@@ -62,10 +68,33 @@ app:
     timeout-ms: ${KEEP_ALIVE_TIMEOUT_MS:10000}
     urls: ${KEEP_ALIVE_URLS:https://proj-resume-intelligence.vercel.app,https://proj-resume-intelligence.onrender.com/health}
 
+  # ── Async analysis worker ─────────────────────────────────
+  analysis:
+    poll-interval-ms: ${ANALYSIS_POLL_INTERVAL_MS:3000}     # how often the worker claims a job
+    reaper-interval-ms: ${ANALYSIS_REAPER_INTERVAL_MS:60000} # how often stale jobs are recovered
+
+# ── Actuator (health / info / metrics) ────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  info:
+    env:
+      enabled: true
+
 # ── Logging ────────────────────────────────────────────────
 logging:
   level:
     root: INFO
     com.proj: DEBUG
     org.springframework.ai: DEBUG
+  pattern:
+    # Surface the correlation ID on every log line.
+    level: "%5p [%X{requestId:-}]"
 

@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import { FileText, AlertCircle, Loader2, Download, TrendingUp, Sparkles, CheckCircle2, ChevronRight, Copy, Check, Filter, Lightbulb } from 'lucide-react';
 import api from '../lib/api';
-import html2pdf from 'html2pdf.js';
-import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
-import { saveAs } from 'file-saver';
 
 interface ResumeDetail {
   id: string;
@@ -84,28 +81,56 @@ export default function ResumeDetailPage() {
   const [copied, setCopied] = useState(false);
   const [skillSearch, setSkillSearch] = useState('');
 
+  // Keeps the latest status readable inside the polling interval without
+  // restarting it on every render.
+  const resumeRef = useRef<ResumeDetail | null>(null);
+  resumeRef.current = resume;
+
   useEffect(() => {
+    let stop = false;
+    const fetchData = async () => {
+      try {
+        const resumeRes = await api.get(`/resumes/${id}`);
+        if (stop) return;
+        setResume(resumeRes.data);
+        if (resumeRes.data.hasAnalysis) {
+          const analysisRes = await api.get(`/resumes/${id}/analysis`);
+          if (stop) return;
+          setAnalysis(analysisRes.data);
+        }
+        setError('');
+      } catch {
+        if (!stop) setError('Failed to load candidate resume details.');
+      } finally {
+        if (!stop) setLoading(false);
+      }
+    };
+
     fetchData();
+
+    // Poll while the background analysis is still running (async upload flow),
+    // then stop once the resume reaches a terminal state.
+    const isTerminal = (status?: string) => status === 'ANALYZED' || status === 'FAILED';
+    const interval = setInterval(async () => {
+      if (stop) return;
+      if (isTerminal(resumeRef.current?.status)) {
+        clearInterval(interval);
+        return;
+      }
+      await fetchData();
+    }, 3000);
+
+    return () => {
+      stop = true;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const fetchData = async () => {
-    try {
-      const resumeRes = await api.get(`/resumes/${id}`);
-      setResume(resumeRes.data);
-      if (resumeRes.data.hasAnalysis) {
-        const analysisRes = await api.get(`/resumes/${id}/analysis`);
-        setAnalysis(analysisRes.data);
-      }
-    } catch {
-      setError('Failed to load candidate resume details.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const exportPDF = () => {
+  const exportPDF = async () => {
     const element = document.getElementById('analysis-content');
     if (!element) return;
+    const { default: html2pdf } = await import('html2pdf.js');
     html2pdf().set({
       margin: [0.5, 0.5] as [number, number],
       filename: `Analysis_${resume?.fileName || 'Resume'}.pdf`,
@@ -117,6 +142,8 @@ export default function ResumeDetailPage() {
 
   const exportWord = async () => {
     if (!analysis) return;
+    const { Document, Packer, Paragraph, HeadingLevel } = await import('docx');
+    const { saveAs } = await import('file-saver');
     const doc = new Document({
       sections: [{
         properties: {},

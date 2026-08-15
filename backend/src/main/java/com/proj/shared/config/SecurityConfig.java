@@ -28,8 +28,13 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final AuthRateLimitFilter authRateLimitFilter;
+    private final RequestIdFilter requestIdFilter;
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000,https://proj-resume-intelligence.vercel.app}")
+    // *.vercel.app covers the production domain AND every random preview-deployment
+    // subdomain (Vercel assigns a new one per branch/preview), so auth never breaks
+    // in previews. Override with APP_CORS_ALLOWED_ORIGINS for stricter control.
+    @Value("${app.cors.allowed-origins:${APP_CORS_ALLOWED_ORIGINS:https://*.vercel.app,http://localhost:5173,http://localhost:3000}}")
     private String allowedOriginsConfig;
 
     @Bean
@@ -61,9 +66,16 @@ public class SecurityConfig {
                         // Public liveness + diagnostics: uptime monitors (UptimeRobot), Render health
                         // checks, and AI config verification must work WITHOUT a JWT.
                         .requestMatchers("/api/v1/ai/status").permitAll()
+                        // Actuator liveness/readiness for Render + uptime monitors.
+                        .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers("/health", "/", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
+                // All three anchor on a standard, always-registered filter. (The
+                // class overload requires the anchor to be a registered filter;
+                // JwtAuthFilter itself is added by instance, so it can't be an anchor.)
+                .addFilterBefore(requestIdFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -77,7 +89,9 @@ public class SecurityConfig {
                 .filter(s -> !s.isEmpty())
                 .toList();
 
-        config.setAllowedOrigins(origins);
+        // allowedOriginPatterns (not allowedOrigins) supports wildcard patterns like
+        // https://*.vercel.app while still echoing the exact origin + credentials.
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
         config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));

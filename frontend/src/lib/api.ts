@@ -9,13 +9,18 @@ const api = axios.create({
   timeout: 120000,
 });
 
-// Request interceptor — attach auth token when available
+// Request interceptor — attach auth token when available + correlation ID so
+// frontend requests can be traced through the backend logs (MDC 'requestId').
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers['X-Request-Id'] =
+      (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     return config;
   },
   (error) => Promise.reject(error),

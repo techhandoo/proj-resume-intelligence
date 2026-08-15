@@ -3,23 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import * as pdfjsLib from 'pdfjs-dist';
-// Bundle the pdf.js worker with the app itself — the old CDN URL 404s or is
-// blocked on many networks, which made every PDF upload fail with a generic error.
-// Pinned to pdf.js 4.x: it feature-detects modern built-ins instead of requiring
-// them, so parsing works on older engines too (Chromium < 140).
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import AppLayout from '../components/AppLayout';
 import { UploadCloud, FileText, File, AlertCircle, Loader2, CheckCircle2, Zap, Sparkles } from 'lucide-react';
 import api from '../lib/api';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-
 /**
  * Extract text with layout awareness: honor explicit line breaks (hasEOL) and
  * keep words on the same line separated by a single space.
+ *
+ * pdf.js (and its ~1.4 MB worker) is loaded lazily here so it is only fetched
+ * when the user actually uploads a PDF — it no longer inflates the main bundle.
+ * Pinned to pdf.js 4.x: it feature-detects modern built-ins instead of requiring
+ * them, so parsing works on older engines too (Chromium < 140).
  */
 async function extractTextFromPDF(file: File): Promise<string> {
+  const pdfjsLib = await import('pdfjs-dist');
+  const { default: pdfWorkerUrl } = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   let fullText = '';

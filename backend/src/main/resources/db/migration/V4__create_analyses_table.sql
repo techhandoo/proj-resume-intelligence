@@ -1,6 +1,6 @@
 -- Analyses table (AI-generated resume analysis results)
 CREATE TABLE analyses (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     resume_id UUID NOT NULL UNIQUE REFERENCES resumes(id) ON DELETE CASCADE,
     summary TEXT,
     skills TEXT,

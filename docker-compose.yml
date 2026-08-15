@@ -37,6 +37,26 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    build: ./backend
+    container_name: proj-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/proj_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_ADDRESSES: amqp://guest:guest@rabbitmq:5672
+      # Local-dev only secrets — set real values in your shell/.env in production.
+      AI_API_KEY: ${AI_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET:-local-dev-only-jwt-secret-change-me-to-a-random-64-char-string}
+      KEEP_ALIVE_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   rabbitmq_data:

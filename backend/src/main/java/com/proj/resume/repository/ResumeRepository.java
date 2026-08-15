@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface ResumeRepository extends JpaRepository<Resume, UUID> {
 
     List<Resume> findByUserIdOrderByUploadedAtDesc(UUID userId);
+
+    List<Resume> findByStatus(Resume.Status status);
 }

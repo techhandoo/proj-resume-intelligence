@@ -1,12 +1,13 @@
 package com.proj.resume.service;
 
-import com.proj.ai.service.AIAnalysisService;
 import com.proj.auth.model.User;
 import com.proj.resume.dto.AnalysisResponse;
 import com.proj.resume.dto.ResumeResponse;
 import com.proj.resume.dto.ResumeUploadRequest;
 import com.proj.resume.model.Analysis;
+import com.proj.resume.model.AnalysisJob;
 import com.proj.resume.model.Resume;
+import com.proj.resume.repository.AnalysisJobRepository;
 import com.proj.resume.repository.AnalysisRepository;
 import com.proj.resume.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,14 @@ public class ResumeService {
 
     private final ResumeRepository resumeRepository;
     private final AnalysisRepository analysisRepository;
-    private final AIAnalysisService aiAnalysisService;
+    private final AnalysisJobRepository analysisJobRepository;
 
+    /**
+     * Persists the resume and enqueues a background analysis job. Returns
+     * immediately with the resume in PROCESSING state — the Groq call happens
+     * off the HTTP thread in {@link AnalysisWorker}, and the frontend polls
+     * until the status becomes ANALYZED or FAILED.
+     */
     @SuppressWarnings("null")
     @Transactional
     public ResumeResponse uploadResume(ResumeUploadRequest request, User user) {
@@ -35,26 +42,16 @@ public class ResumeService {
                 .fileType("text/plain")
                 .fileSize((long) request.getContent().length())
                 .rawText(request.getContent())
-                .status(Resume.Status.UPLOADED)
+                .status(Resume.Status.PROCESSING)
                 .build();
 
         resume = resumeRepository.save(resume);
-        log.info("Resume uploaded: {} by user: {}", resume.getId(), user.getEmail());
+        log.info("Resume uploaded: {} by user: {} — analysis job enqueued", resume.getId(), user.getEmail());
 
-        // Trigger AI analysis
-        try {
-            resume.setStatus(Resume.Status.PROCESSING);
-            resumeRepository.save(resume);
-
-            aiAnalysisService.analyzeResume(resume);
-
-            resume.setStatus(Resume.Status.ANALYZED);
-            resumeRepository.save(resume);
-        } catch (Exception e) {
-            log.error("Analysis failed for resume: {}", resume.getId(), e);
-            resume.setStatus(Resume.Status.FAILED);
-            resumeRepository.save(resume);
-        }
+        analysisJobRepository.save(AnalysisJob.builder()
+                .resumeId(resume.getId())
+                .status(AnalysisJob.Status.PENDING)
+                .build());
 
         return ResumeResponse.from(resume);
     }

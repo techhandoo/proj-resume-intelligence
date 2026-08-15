@@ -11,15 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,6 +114,16 @@ public class AIAnalysisService {
         return s.length() <= 500 ? s : s.substring(0, 500) + "...";
     }
 
+    /** Cap resume/JD size before it hits the LLM so token cost stays bounded. */
+    private static final int MAX_RESUME_CHARS = 12_000;
+    private static final int MAX_JD_CHARS = 6_000;
+
+    private static String limitLength(String text, int maxChars) {
+        if (text == null) return "";
+        if (text.length() <= maxChars) return text;
+        return text.substring(0, maxChars) + "\n...[truncated]";
+    }
+
     /** System message: role, task, rubric, schema — never mixed with candidate data. */
     private static final String ANALYSIS_SYSTEM_PROMPT = """
             You are a principal-level resume analyst and an expert in ATS (Applicant Tracking System) parsing and screening engines with 10+ years of experience in enterprise talent-acquisition infrastructure. You have built and tuned the scoring models used by large recruiting teams, and you are unsparing in your evaluations.
@@ -174,7 +179,7 @@ public class AIAnalysisService {
         String content = null;
         try {
             String system = ANALYSIS_SYSTEM_PROMPT;
-            String user = String.format(ANALYSIS_USER_PROMPT, resume.getRawText());
+            String user = String.format(ANALYSIS_USER_PROMPT, limitLength(resume.getRawText(), MAX_RESUME_CHARS));
             content = callGroqApi(system, user);
             log.info("AI response received (length {}): {}", content != null ? content.length() : 0, content);
         } catch (Exception e) {
@@ -249,19 +254,9 @@ public class AIAnalysisService {
         }
         String jsonPayload = objectMapper.writeValueAsString(requestMap);
 
-        TrustManager[] trustAllCerts = new TrustManager[]{
-            new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
-            }
-        };
-
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, trustAllCerts, new SecureRandom());
-
+        // Default JVM trust store — Groq's certificates are valid, so we do NOT
+        // disable TLS verification (that would open the call to MITM attacks).
         HttpClient client = HttpClient.newBuilder()
-                .sslContext(sslContext)
                 .connectTimeout(java.time.Duration.ofSeconds(10))
                 .build();
 
@@ -652,7 +647,8 @@ public class AIAnalysisService {
 
     public CoverLetterResult generateCoverLetter(String resumeText, String jobDescription, String tone) {
         String toneLabel = (tone == null || tone.isBlank()) ? "professional" : tone.trim();
-        String user = String.format(COVER_LETTER_USER_PROMPT, toneLabel, jobDescription, resumeText);
+        String user = String.format(COVER_LETTER_USER_PROMPT, toneLabel,
+                limitLength(jobDescription, MAX_JD_CHARS), limitLength(resumeText, MAX_RESUME_CHARS));
 
         try {
             String markdown = callGroqApiTextOnly(COVER_LETTER_SYSTEM_PROMPT, user);
